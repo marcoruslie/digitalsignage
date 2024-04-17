@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-    const data = await fetch(
+    const data = await $fetch(
         "https://ws.stts.edu/pengumuman/0/pengumumanSIM/1/&appname=digitalsignage",
         {
           method: "POST",
@@ -10,5 +10,5 @@ export default defineEventHandler(async (event) => {
         }
       );
       
-      return data.json();
+      return data;
 })
