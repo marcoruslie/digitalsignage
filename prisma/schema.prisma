@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  us_username String @id
+  us_password String
+  us_role_id String
+  role Role @relation(fields: [us_role_id], references: [role_id])
+  categoryuser Category_For_User[]
+  listannouncement List_Announcement[]
+}
+
+model Role {
+  role_id String @id @default(uuid())
+  role_name String
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+  user User[]
+}
+
+model Category{
+  cat_id String @id @default(uuid())
+  cat_name String
+  cat_qty Int
+  cat_duration Int
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+  templates Template_Object[]
+  categoryuser Category_For_User[]
+  listannouncement List_Announcement[]
+}
+model Category_For_User{
+  cu_id String @id @default(uuid())
+  cu_cat_id String
+  cu_us_username String
+  user User @relation(fields: [cu_us_username], references: [us_username])
+  category Category @relation(fields: [cu_cat_id], references: [cat_id])
+}
+model List_Announcement{
+  la_id String @id @default(uuid())
+  la_title String
+  la_content String
+  la_cat_id String
+  category Category @relation(fields: [la_cat_id], references: [cat_id])
+  la_pl_id String
+  playlist Playlist @relation(fields: [la_pl_id], references: [pl_id])
+  la_us_username String
+  user User @relation(fields: [la_us_username], references: [us_username])
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+  announcement_in_list Announcement_in_List[]
+}
+model Template_Object{
+  template_id String @id @default(uuid())
+  template_object String
+  template_x Int
+  template_y Int
+  template_cat_id String
+  category Category @relation(fields: [template_cat_id], references: [cat_id])
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+}
+model Playlist{
+  pl_id String @id @default(uuid())
+  pl_name String
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+  screen Screen[]
+  listannouncement List_Announcement[]
+}
+
+model Announcement_in_List{
+  ail_id String @id @default(uuid())
+  ail_an_id String
+  ail_la_id String
+  announcement Announcement @relation(fields: [ail_an_id], references: [an_id])
+  listannouncement List_Announcement @relation(fields: [ail_la_id], references: [la_id])
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+}
+
+model Announcement{
+  an_id String @id @default(uuid())
+  an_title String
+  an_url String
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+  announcement_in_list Announcement_in_List[]
+}
+
+model Screen{
+  sc_id String @id @default(uuid())
+  sc_ip String
+  sc_location String
+  sc_name String
+  sc_pl_id String?
+  playlist Playlist? @relation(fields: [sc_pl_id], references: [pl_id])
+}
+
+
