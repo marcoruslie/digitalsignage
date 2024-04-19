@@ -1,6 +1,6 @@
 export default()=>{
     const createUser = async (user) => {    
-        const result = await fetch('/api/user/createUser', {
+        const result = await $fetch('/api/user/createUser', {
             method: 'POST',
             body: {
                 us_username: user.us_username,
@@ -11,11 +11,11 @@ export default()=>{
         return result
     }
     const getUser = async () => {
-        const result = await fetch('/api/user/getUser')
+        const result = await $fetch('/api/user/getUser')
         return result
     }
     const loginUser = async (user) => {
-        const result = await fetch('/api/user/loginUser', {
+        const result = await $fetch('/api/user/loginUser', {
             method: 'POST',
             body: {
                 us_username: user.us_username,
@@ -25,7 +25,7 @@ export default()=>{
         return result
     }
     const deleteUser = async (user) => {    
-        const result = await fetch('/api/user/deleteUser', {
+        const result = await $fetch('/api/user/deleteUser', {
             method: 'DELETE',
             body: {
                 us_id: user.us_id

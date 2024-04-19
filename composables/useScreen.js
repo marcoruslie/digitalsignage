@@ -10,7 +10,7 @@ export default () => {
             body: {
                 sc_name: screen.sc_name,
                 sc_location: screen.sc_location,
-                sc_ip: screen.sc_ip
+                sc_ip: 'http://'+screen.sc_ip
             }
         })
         return result

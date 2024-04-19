@@ -11,29 +11,58 @@
                 <div class="text-center font-bold text-3xl text-white mb-16">ISTTS Digital Signage</div>
             </div>
         </div>
-        <div class="w-full h-full bg-white relative sm:w-1/2">
-            <div class="flex flex-col justify-center items-center h-full">
-                <div class="text-center font-bold text-5xl text-cyan-700 mb-16">User Login</div>
-                <input v-model="username" type="text" class="rounded-md border-cyan-100 border-2 py-4 px-2 w-[300px] placeholder:text-OnPrimaryContainer  placeholder:font-semibold font-semibold my-2 hover:border-cyan-500 hover:duration-500" placeholder="Your Username">
-                <input v-model="password" type="password" class="rounded-md border-cyan-100 border-2 py-4 px-2 w-[300px] placeholder:text-OnPrimaryContainer placeholder:font-semibold font-semibold mt-2 hover:border-cyan-500 hover:duration-500" placeholder="Your Password">
+        <form @submit.prevent="login" class="w-full h-full bg-white relative sm:w-1/2">
+            <div class="flex flex-col justify-center items-center h-full space-y-5">
+                <div class="text-center font-bold text-5xl text-cyan-700">User Login</div>
+                <input v-model="username" type="text" required
+                    class="rounded-md border-Primary border-2 py-4 px-2 w-[300px] placeholder:text-OnPrimaryContainer  placeholder:font-semibold font-semibold hover:border-cyan-500 hover:duration-500"
+                    placeholder="Your Username">
+                <input v-model="password" type="password" required
+                    class="rounded-md border-Primary border-2 py-4 px-2 w-[300px] placeholder:text-OnPrimaryContainer placeholder:font-semibold font-semibold hover:border-PrimaryContainer hover:duration-500"
+                    placeholder="Your Password">
                 <!-- <div><input type="checkbox" name="" id="">Remember Me? </div> -->
-                <button @click="login" class="bg-cyan-100 px-3 py-1 rounded-md border-collapse border-cyan-700 border-2 w-[300px]
-                    hover:bg-cyan-300 hover:duration-500">Sign In</button>
+                <button type="submit" class="bg-Primary text-PrimaryContainer px-3 py-2 rounded-md border-collapse w-[300px]
+                    hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-500">Sign In</button>
             </div>
-        </div>
-
+        </form>
     </div>
+    <NotificationModal :modalHeader="modalHeader" :modalContent="modalContent" :buttonFunction="modalFunction"
+        :isOpen="isOpen" />
 </template>
 <script setup>
+
+
 const username = ref('');
 const password = ref('');
-console.log(process.env.WS_TOKEN)
+const isOpen = ref(false);
+const modalHeader = ref('');
+const modalContent = ref('');
+const userData = {
+    username: 'admin',
+    password: 'admin'
+}
+onMounted(() => {
+    sessionStorage.setItem('currentUser',JSON.stringify(userData))
+})
 function login() {
-    const router = useRouter();
-    if(username.value==='admin' && password.value==='admin') {
-        router.push('Admin/MasterScreenPage')
+    if (username.value === 'admin' && password.value === 'admin') {
+        modalHeader.value = 'Login Success';
+        modalContent.value = 'Welcome Admin';
+        isOpen.value = true;
     } else {
-        router.push('Biro/AnnouncementPage')
+        modalHeader.value = 'Login Failed';
+        modalContent.value = 'Username or Password is incorrect';
+        isOpen.value = true;
+    }
+}
+
+function modalFunction() {
+    const router = useRouter();
+    if (modalHeader.value == 'Login Success') {
+        router.push('Admin/MasterScreenPage')
+    }
+    else {
+        isOpen.value = false;
     }
 }
 

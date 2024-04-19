@@ -73,7 +73,6 @@
                     </select>
                 </div>
                 <div class="max-h-full">
-
                     <div v-if="kategori == 'pengumuman kampus'" v-for="(data, index) in dataPengumuman"
                         class="h-[100px] w-full rounded shadow-xl hover:bg-slate-50 flex items-center justify-between space-x-3">
                         <div class="flex items-center space-x-3" @click="">

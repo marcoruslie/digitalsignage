@@ -8,5 +8,5 @@ export default defineEventHandler(async (event) => {
           },
         }
       );
-      return data.json();
+      return data;
 })

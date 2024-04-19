@@ -18,6 +18,8 @@ model User {
   us_password String
   us_role_id String
   role Role @relation(fields: [us_role_id], references: [role_id])
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
   categoryuser Category_For_User[]
   listannouncement List_Announcement[]
 }
@@ -45,6 +47,8 @@ model Category_For_User{
   cu_id String @id @default(uuid())
   cu_cat_id String
   cu_us_username String
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
   user User @relation(fields: [cu_us_username], references: [us_username])
   category Category @relation(fields: [cu_cat_id], references: [cat_id])
 }

@@ -266,7 +266,8 @@ const toggleDropDown = (idx) => {
 onMounted(async () => {
     isDropdownOpen.value.push(false);
     listScreen.value = await getScreen()
-
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
+    console.log(currentUser)
 })
 const toggleModal = (modal, screen) => {
     modal.classList.toggle('hidden');

@@ -12,12 +12,12 @@
                     <div>{{modalContent}}</div>
                 </div>
             </div>
-            <div @click="closeModal"
+            <div @click="buttonFunction"
                 class="rounded bg-Primary text-center cursor-pointer px-6 py-2 text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-300">
                 OKE</div>
         </div>
     </div>
 </template>
 <script setup>
-const { modalHeader, modalContent, closeModal, isOpen } = defineProps(['modalHeader', 'modalContent', 'closeModal', 'isOpen']);
+const { modalHeader, modalContent, buttonFunction, isOpen } = defineProps(['modalHeader', 'modalContent', 'buttonFunction', 'isOpen']);
 </script>
