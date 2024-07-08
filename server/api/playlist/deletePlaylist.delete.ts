@@ -6,5 +6,10 @@ export default defineEventHandler(async(event)=>{
             pl_id: body.pl_id
         }
     })
-    return result
+    return{
+        statusCode: 200,
+        body:{
+            message: "Berhasil Menghapus Playlist"
+        } 
+    } 
 })

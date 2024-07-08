@@ -4,7 +4,7 @@
         <div class="p-4 w-full max-w-6xl h-5/6 relative bg-white rounded-lg shadow sm:p-5 overflow-auto">
             <div class="flex gap-1 justify-between items-center pb-4 mb-4 rounded-t border-b">
                 <h3 class="text-lg font-semibold text-OnPrimaryContainer">
-                    Daftar Pengumuman
+                    Detail Pengumuman
                 </h3>
                 <svg @click="closeModal" xmlns="http://www.w3.org/2000/svg"
                     class="h-6 w-6 hover:cursor-pointer hover:bg-Primary hover:duration-500 hover:rounded-lg"

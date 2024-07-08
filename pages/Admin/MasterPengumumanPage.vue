@@ -11,6 +11,24 @@
                     </div>
                     <div class="border-b-2 border-Primary mt-1"></div>
                     <div class="flex-grow overflow-auto">
+                        <div v-for="(data, index) in dataListAnnouncement"
+                            class="h-[100px] w-full rounded shadow-xl flex items-center justify-between space-x-3 px-2">
+                            <div class="flex items-center space-x-3 justify-between w-full">
+                                <!-- <div class="w-[100px] h-[100px] bg-PrimaryContainer rounded-l">
+                                <img :src="data.pengumuman_namafile" alt="">
+                            </div> -->
+                                <div class="w-full">
+                                    <div class="font-bold text-lg m-1">{{ data.la_title }}</div>
+                                </div>
+                                <div class="w-full flex justify-end">
+                                    <img src="/icon_detail.png"
+                                        @click="toggleModalShowListPengumuman(modalShowListPengumuman, data)"
+                                        class="w-[50px] h-[50px] hover:bg-slate-200 rounded hover:duration-300">
+                                </div>
+
+                            </div>
+
+                        </div>
                         <div class="flex flex-col space-y-2 mt-1" @click="toggleModal(modalListPengumuman)">
                             <div
                                 class="h-[150px] w-full rounded shadow-xl hover:bg-slate-50 flex items-center justify-between space-x-3 cursor-pointer">
@@ -63,19 +81,15 @@
             </div>
             <div class="flex flex-col space-y-2">
                 <div>
-                    <div
-                        class="h-[350px] w-full rounded shadow-xl hover:bg-slate-50 flex items-center cursor-pointer">
+                    <div class="h-[350px] w-full rounded shadow-xl hover:bg-slate-50 flex items-center cursor-pointer">
                         <div class="w-[90%] flex justify-center">
                             <img src="/Monitor.png" alt="" class="h-[350px]">
                         </div>
-                        
+
                         <div class="w-[10%]">
                             <img src="/icon-delete.png"
                                 class="cursor-pointer rounded hover:shadow-2xl w-14 hover:bg-red-300 hover:duration-1000 bg-transparent">
                         </div>
-
-
-
                     </div>
 
                 </div>
@@ -86,14 +100,25 @@
             </div>
         </div>
     </div>
+    
 
 </template>
 
 <script setup>
 
 const modalListPengumuman = ref(null)
+const dataAnnouncementInList = ref(null)
 const toggleModal = (modal) => {
     modal.classList.toggle('hidden')
 }
-
+const toggleModalShowListPengumuman = (modal, data) => {
+    toggleModal(modal)
+    if(modal.classList.contains('hidden')){
+        dataAnnouncementInList.value = null
+    }
+    else{
+        dataAnnouncementInList.value = data
+    
+    }
+}
 </script>

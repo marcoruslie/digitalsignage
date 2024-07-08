@@ -24,8 +24,4 @@ export async function initSocket(event: H3Event){
     console.log(options.cors)
     // @ts-ignore
     io.attach(event.node.res.socket?.server)
-    io.on('connection', (socket) => { 
-        console.log(socket.handshake.headers);
-        socket.emit('tes', { message: 'Connection Established!'})
-    });
 }

@@ -6,16 +6,7 @@
         <div class="h-full w-[80%] bg-white rounded-xl flex-col p-2">
             <div class="flex justify-between items-center">
                 <div class="text-Primary font-bold text-2xl">Daftar Monitor</div>
-                <div class="relative">
-                    <input type="text" placeholder="Search..."
-                        class="block w-full py-2 pl-10 pr-4 leading-tight bg-white border border-gray-300 rounded focus:outline-none focus:bg-white focus:border-gray-500">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3">
-                        <svg class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 15l5 5M10 14a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0 0a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
-                        </svg>
-                    </div>
-                </div>
+
             </div>
             <div class="border-b-2 border-Primary mt-1"></div>
             <div class="flex flex-wrap m-1">
@@ -27,13 +18,14 @@
                     <div>{{ screen.sc_location }}</div>
                     <div>{{ screen.sc_ip }}</div>
 
-                    <div v-if="screen.playlist!=null">{{ screen.playlist.pl_name }}</div>
-                    <div class="flex">Status : <div class="text-red-400">Offline</div>
+                    <div v-if="screen.playlist != null">{{ screen.playlist.pl_name }}</div>
+                    <div class="flex">Status : <div :class="statusClass(screen.sc_ip)">{{ statusText(screen.sc_ip) }}
+                        </div>
                     </div>
                 </div>
                 <div class="bg-Primary h-[260px] w-[260px] rounded flex flex-col items-center justify-center mx-1 cursor-pointer hover:shadow-2xl hover:bg-OnPrimaryContainer text-OnPrimary"
                     @click="toggleModal(modalAddScreen)">
-                    <img src="\icon-add.png" alt="">
+                    <img src="/icon-add.png" alt="">
                     <div>Add New Screen</div>
                 </div>
             </div>
@@ -51,17 +43,53 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </div>
-            <iframe v-if="currentScreen != null" :src="currentScreen.sc_ip" width="70%" height="600px" frameborder="2"
-                sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-                style="pointer-events: none;"></iframe>
+            <iframe v-if="currentScreen != null" :src="currentScreen.sc_ip + '/preview'" width="70%" height="600px"
+                frameborder="2" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                style="pointer-events: none;" class="bg-white"></iframe>
             <div class="flex-col space-y-3">
                 <div @click="toggleModalEdit(modalEditScreen)"
                     class="rounded bg-Primary text-center cursor-pointer px-6 py-2 text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-300">
-                    Edit Screen</div>
+                    Ganti Data Screen</div>
                 <div @click="toggleModalEdit(modalPlaylist)"
                     class="rounded bg-Primary text-center cursor-pointer px-6 py-2 text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-300">
-                    Ganti Playlist</div>
+                    Konfigurasi Playlist</div>
+                <div @click="toggleModalEdit(modalChangeTemplate)"
+                    class="rounded bg-Primary text-center cursor-pointer px-6 py-2 text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-300">
+                    Ganti Template</div>
             </div>
+        </div>
+    </div>
+    <!-- MODAL GANTI TEMPLATE -->
+    <div ref="modalChangeTemplate"
+        class="hidden overflow-x-hidden flex fixed top-0 right-0 left-0 z-10 justify-center items-center h-screen bg-black bg-opacity-50">
+        <div class="p-4 w-full max-w-2xl relative bg-white rounded-lg shadow sm:p-5">
+            <div class="flex gap-1 justify-between items-center pb-4 mb-4 rounded-t border-b">
+                <h3 class="text-lg font-semibold text-OnPrimaryContainer">
+                    Ganti Template
+                </h3>
+                <svg @click="toggleModalEdit(modalChangeTemplate)" xmlns="http://www.w3.org/2000/svg"
+                    class="h-6 w-6 hover:cursor-pointer hover:bg-Primary hover:duration-500 hover:rounded-lg"
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </div>
+            <form @submit.prevent="changeTemplate" class="flex flex-col space-y-2">
+                <div>
+                    Template 1
+                    <input v-model="screenTemplate" type="radio" name="template" id="template" value="template1">
+                </div>
+                <div>
+                    Template 2
+                    <input v-model="screenTemplate" type="radio" name="template" id="template" value="template2">
+                </div>
+                <div>
+                    Template 3
+                    <input v-model="screenTemplate" type="radio" name="template" id="template" value="template3">
+                </div>
+                <button type="submit"
+                    class="w-full bg-Primary text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-300 rounded py-2">Ganti
+                    Template</button>
+            </form>
         </div>
     </div>
     <!-- MODAL TAMBAH SCREEN -->
@@ -138,38 +166,62 @@
 
             </div>
             <div class="flex-col flex-grow space-y-2 overflow-auto">
-                <div v-for="n in 6">
+                {{ screenPlaylist }}
+                <div v-if="!loadPlaylist" v-for="(data, index) in listPlaylist">
                     <div
                         class="h-[120px] w-full rounded shadow-xl hover:bg-slate-50 flex items-center justify-between space-x-3 cursor-pointer">
-                        <div class="flex items-center space-x-3" @click="toggleDropDown(0)">
-                            <div class="w-[120px] h-[120px] bg-PrimaryContainer rounded-l"></div>
+                        <div class="flex items-center space-x-3" @click="toggleDropDown(index)">
                             <div class="flex-col">
-                                <div class="font-bold text-lg m-1">Playlist 20 Maret</div>
-                                <div class="text-base mx-1">22 Maret 2024 | 10:55 WIB</div>
-                                <div class="text-base mx-1">Durasi : 00 Menit 58 Detik</div>
+                                <div class="font-bold text-lg m-1">{{ data.pl_name }}</div>
+                                <div class="text-base mx-1">Dibuat : {{
+                    new Date(data.createdAt).toLocaleDateString('id-ID', {
+                        day: '2-digit', month:
+                            'long', year: 'numeric'
+                    })
+                }}</div>
+                                <div class="text-base mx-1">Jumlah List Pengumuman : {{
+                        data.list_in_playlist.length
+                    }}</div>
                             </div>
                         </div>
-                        <div
-                            class="relative w-14 h-8 rounded-full p-1 border-OnPrimaryContainer border-2 flex items-center bg-slate-200">
-                            <input type="checkbox" @click="toggle"
-                                class="absolute w-6 h-6 rounded-full appearance-none cursor-pointer bg-white border-none checked:right-0 checked:left-6 transition-transform duration-1000 checked:bg-green-400">
+                        <div class="flex space-x-2">
+                            <div class="rounded-md overflow-hidden">
+                                <input v-model="selectedDate[data.pl_id]" type="date" :disabled="isDataExist(data.pl_id)">
+                            </div>
+                            <div @click="toggleSelectPlaylist(data.pl_id, selectedDate[data.pl_id])"
+                                class="relative w-14 h-8 rounded-full p-1 border-OnPrimaryContainer border-2 flex items-center bg-slate-200">
+                                <input type="checkbox" :checked="isDataExist(data.pl_id)" disabled
+                                    class="absolute w-6 h-6 rounded-full appearance-none cursor-pointer bg-white border-none checked:right-0 checked:left-6 transition-transform duration-1000 checked:bg-green-400">
+                            </div>
+
                         </div>
                     </div>
                     <div class="bg-white shadow-lg rounded w-[100%] duration-1000 overflow-hidden transition-all"
-                        :class="{ 'max-h-screen': isDropdownOpen[n], 'max-h-0': !isDropdownOpen[n] }">
+                        :class="{ 'max-h-screen': isDropdownOpen[index], 'max-h-0': !isDropdownOpen[index] }">
                         <ul class="py-1">
-                            <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between">
-                                <div>1. Pengumuman Tempat Duduk</div>
-                                <div>
-                                    <div>Tipe : Gambar</div>
-                                    <div>Durasi : 40 Detik</div>
+                            <li v-for="(dataListAn, indexListAn) in data.list_in_playlist"
+                                class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between w-full">
+                                <div class="w-full">
+                                    <div>
+                                        {{ (indexListAn + 1) + '. ' + dataListAn.listannouncement.la_title }}
+                                    </div>
+                                    <div>
+                                        Kategori: {{ dataListAn.listannouncement.category.cat_name }}
+                                    </div>
                                 </div>
-                            </li>
-                            <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between">
-                                <div>2. Daftar Acara</div>
-                                <div>
-                                    <div>Tipe : Video</div>
-                                    <div>Durasi : 18 Detik</div>
+                                <div class="w-full">
+                                    <div>Jumlah Pengumuman :
+                                        {{ dataListAn.listannouncement.announcement_in_list.length }}
+                                    </div>
+                                    <div>
+                                        Durasi List Pengumuman :
+                                        {{ parseInt(dataListAn.listannouncement.category.cat_duration) *
+                    parseInt(dataListAn.listannouncement.announcement_in_list.length) }}s
+                                    </div>
+                                    <div>
+                                        Durasi Per Pengumuman :
+                                        {{ parseInt(dataListAn.listannouncement.category.cat_duration) }}s
+                                    </div>
                                 </div>
                             </li>
                         </ul>
@@ -177,15 +229,16 @@
                     </div>
                 </div>
             </div>
-            <div @click="refreshClient"
+            <div @click="uploadPlaylistFile"
                 class="rounded bg-Primary text-center cursor-pointer px-6 py-2 text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-300">
-                Ganti Playlist</div>
+                Simpan Playlist</div>
         </div>
     </div>
     <!-- MODAL EDIT SCREEN -->
     <div ref="modalEditScreen"
         class="hidden overflow-x-hidden flex fixed top-0 right-0 left-0 z-10 justify-center items-center h-screen bg-black bg-opacity-50">
-        <div class="p-4 w-1/2 max-w-6xl h-3/6/6 relative bg-white rounded-lg shadow sm:p-5 flex flex-col space-y-2">
+        <form @submit.prevent="editScreen"
+            class="p-4 w-1/2 max-w-6xl h-3/6/6 relative bg-white rounded-lg shadow sm:p-5 flex flex-col space-y-2">
             <div class="flex justify-between items-center pb-4 rounded-t border-b">
                 <h3 class="text-lg font-semibold text-OnPrimaryContainer">
                     Edit Screen Data
@@ -202,53 +255,64 @@
                 <div class="flex flex-col space-y-2 text-OnPrimaryContainer">
                     <div class="flex flex-col">
                         <label for="screenName">Screen Name</label>
-                        <input type="text"
+                        <input type="text" v-model="screenName"
                             class="border-2 border-gray-500 hover:border-Primary rounded-md hover:duration-300 px-2 py-2">
                     </div>
                     <div class="flex flex-col">
                         <label for="screenLocation">Screen Location</label>
-                        <input type="text"
+                        <input type="text" v-model="screenLocation"
                             class="border-2 border-gray-500 hover:border-Primary rounded-md hover:duration-300 px-2 py-2">
                     </div>
                     <div class="flex flex-col">
                         <label for="screenUrl">Screen IP</label>
-                        <input type="text"
+                        <input type="text" v-model="screenIP"
                             class="border-2 border-gray-500 hover:border-Primary rounded-md hover:duration-300 px-2 py-2"
                             placeholder="example: 192.168.0.33">
                     </div>
                 </div>
             </div>
-            <div @click="refreshClient"
+            <button @click="refreshClient"
                 class="rounded bg-Primary text-center cursor-pointer px-6 py-2 text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-300">
-                Simpan</div>
-        </div>
+                Simpan
+            </button>
+        </form>
     </div>
     <NotificationModal :modal-header="modalHeader" :modal-content="modalContent" :is-open="isOpen"
-        :close-modal="closeNotif" />
+        :button-function="closeNotif" />
 </template>
 
 <script setup>
-const { createScreen, deleteScreen, getScreen } = useScreen()
-const { refreshClient } = useClient()
-const listScreen = ref([])
+import { io } from 'socket.io-client';
+const { getPlaylist } = usePlaylist()
+const { sendMessage, refreshConnectedClient, getCLient } = useSocket()
+const { createScreen, deleteScreen, getScreen, updateScreen } = useScreen()
+const listScreen = ref(await getScreen())
 const currentScreen = ref(null)
+// VAR PLAYLIST
+const listPlaylist = ref(await getPlaylist())
+const router = useRouter()
 // MODAL DECLARATION
 const modalAddScreen = ref(null);
 const modalScreen = ref(null);
 const modalPlaylist = ref(null);
 const modalEditScreen = ref(null);
-
+const modalChangeTemplate = ref(null);
 // SCREEN VAR
 const screenIP = ref('');
 const screenName = ref('');
 const screenLocation = ref('');
-
+const screenTemplate = ref('');
+const screenPlaylist = ref([]);
+const loadPlaylist = ref(true)
+const selectedDate = ref([])
 //NOTIF MODAL VAR
 let modalHeader = '';
 let modalContent = '';
 const isOpen = ref(false);
 const closeNotif = () => {
     isOpen.value = false;
+    const router = useRouter()
+    router.go()
 }
 const openNotif = (header, content) => {
     modalHeader = header;
@@ -256,29 +320,133 @@ const openNotif = (header, content) => {
     isOpen.value = true;
 }
 
-
-const iframeSrc = ref('');
-const playlist = ref([]);
 const isDropdownOpen = ref([]);
 const toggleDropDown = (idx) => {
     isDropdownOpen.value[idx] = !isDropdownOpen.value[idx];
 }
+const isDataExist = (pl_id) => {
+    return screenPlaylist.value.some(playlist => playlist.pl_id === pl_id)
+}
+const datePlaylist = (pl_id) => {
+    const playlist = screenPlaylist.value.find(playlist => playlist.pl_id === pl_id)
+    if (playlist) {
+        // Parse the date string in ddmmyy format to yyyy-mm-dd format
+        const formattedDate = parseDate(playlist.date);
+        return formattedDate;
+    }
+    return null;
+
+}
+const parseDate = (dateString) => {
+    // Convert ddmmyy string to yyyy-mm-dd format
+    const day = dateString.substring(0, 2);
+    const month = dateString.substring(2, 4);
+    const year = '20' + dateString.substring(4, 6); // Assuming years are in 2000s
+    return `${year}-${month}-${day}`;
+}
+const formatDate = (dateString) => {
+    const dateObject = new Date(dateString);
+    const day = String(dateObject.getDate()).padStart(2, '0');
+    const month = String(dateObject.getMonth() + 1).padStart(2, '0'); // January is 0!
+    const year = String(dateObject.getFullYear()).substring(2);
+    return `${day}${month}${year}`;
+}
+const listClient = ref(await getCLient())
+const statusText = (sc_ip) => {
+    return listClient.value.some(client => client.socket_ip === sc_ip) ? "Online" : "Offline";
+};
+const statusClass = (sc_ip) => {
+    return listClient.value.some(client => client.socket_ip === sc_ip) ? "text-green-400" : "text-red-400";
+};
+const host = 'http://localhost:3000';
+const socket = io(host, {
+    path: '/api/socket.io',
+});
 onMounted(async () => {
     isDropdownOpen.value.push(false);
-    listScreen.value = await getScreen()
-    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
-    console.log(currentUser)
+
+    socket.on('connect', () => {
+        socket.emit('clientType', "server")
+    })
+    socket.on('userConnect', async (response) => {
+        listClient.value = await getCLient()
+        console.log('User Connected: ', response)
+        const clientsWithSameIP = listClient.value.filter(client => client.socket_ip === response.ip);
+        console.log(clientsWithSameIP)
+        if (clientsWithSameIP.length === 1) {
+            router.go();
+        }
+    })
+    socket.on('userDisconnect', async (response) => {
+        console.log('User Disconnected: ', response)
+        listClient.value = await getCLient()
+        const isExistingClient = listClient.value.some(client => client.socket_ip === response.ip)
+        if (!isExistingClient) {
+            router.go()
+        }
+    })
+    socket.on('resDataPlaylist', (response) => {
+        screenPlaylist.value = response.data;
+        for (let i = 0; i < listPlaylist.value.length; i++) {
+            selectedDate.value[listPlaylist.value[i].pl_id] = datePlaylist(listPlaylist.value[i].pl_id)
+        }
+        loadPlaylist.value = false
+    })
+
 })
+const toggleSelectPlaylist = (pl_id, date) => {
+    const playlist = {
+        pl_id: pl_id,
+        date: formatDate(date)
+    }
+    if (screenPlaylist.value.some(pl => pl.pl_id === pl_id)) {
+        screenPlaylist.value = screenPlaylist.value.filter(pl => pl.pl_id !== pl_id)
+    } else {
+        screenPlaylist.value.push(playlist)
+    }
+}
+const uploadPlaylistFile = () => {
+    alert(screenPlaylist.value)
+
+}
+const changeTemplate = () => {
+    socket.emit('changeTemplate', { template: screenTemplate.value, ip: currentScreen.value.sc_ip })
+}
 const toggleModal = (modal, screen) => {
     modal.classList.toggle('hidden');
-    if (modal.classList.contains('hidden')) {
+    if (modalScreen.value.classList.contains('hidden')) {
         currentScreen.value = null;
-    } else {
+        screenName.value = "";
+        screenLocation.value = "";
+        screenIP.value = "";
+    }
+    else {
         currentScreen.value = screen;
     }
 }
 const toggleModalEdit = (modal) => {
     modal.classList.toggle('hidden');
+    if (!modalPlaylist.value.classList.contains('hidden')) {
+        socket.emit('reqDataPlaylist', { ip: currentScreen.value.sc_ip })
+        loadPlaylist.value = true
+    }
+    screenName.value = currentScreen.value.sc_name;
+    screenLocation.value = currentScreen.value.sc_location;
+    screenIP.value = currentScreen.value.sc_ip;
+}
+const editScreen = async () => {
+    const data = {
+        sc_id: currentScreen.value.sc_id,
+        sc_name: screenName.value,
+        sc_location: screenLocation.value,
+        sc_ip: screenIP.value
+    }
+    updateScreen(data).then((res) => {
+        openNotif('Success', res);
+    }).catch((err) => {
+        openNotif('Error', err);
+    })
+
 }
 const addNewScreen = async () => {
     const data = {
@@ -288,9 +456,10 @@ const addNewScreen = async () => {
     }
     console.log(data)
     createScreen(data).then((res) => {
-        openNotif('Success', res);
+        openNotif('Success', "Berhasil Menambah Screen Baru");
     }).catch((err) => {
         openNotif('Error', err);
     })
 }
+
 </script>

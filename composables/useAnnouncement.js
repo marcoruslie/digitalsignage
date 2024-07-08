@@ -1,9 +1,35 @@
 export default () => {
     const getListAnnouncement = async () => {
         const result = await $fetch('/api/announcement/getListAnnouncement')
-        return result.json()
+        return result
     }
+    const addListAnnouncement = async (data) => {
+        const announcement = await $fetch('/api/announcement/getAnnouncement')
+        const selectedAnnouncement = data.announcements
+        const filteredAnnouncement = selectedAnnouncement.filter(item => {
+            return !announcement.some(ann => ann.an_id === item.an_id);
+        })
+        const result = await $fetch('/api/announcement/createListAnnouncement', {
+            method: 'POST',
+            body: {
+                la_cat_id: data.kategori,
+                la_title: data.listName,
+                la_content: '',
+                la_us_username: data.currentUser,
+                filteredAnnouncements: filteredAnnouncement,
+                announcements: selectedAnnouncement
+            }
+        })
+        return result
+    }
+    const getAnnouncement = async () => {
+        const result = await $fetch('/api/announcement/getAnnouncement')
+        return result
+    }
+
     return {
-        getListAnnouncement
+        getListAnnouncement,
+        addListAnnouncement,
+        getAnnouncement
     }
 }

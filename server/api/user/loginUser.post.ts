@@ -1,4 +1,5 @@
 import {prisma} from '../../db/index'
+import { sign, verify } from 'jsonwebtoken'
 export default defineEventHandler(async(event)=>{
     const body = await readBody(event)
     const user = await prisma.user.findFirst({
@@ -9,11 +10,7 @@ export default defineEventHandler(async(event)=>{
         include:{
             categoryuser:{
                 include:{
-                    category:{
-                        select:{
-                            cat_name: true
-                        },
-                    },
+                    category:true
                 }
             },
             listannouncement:{
@@ -24,8 +21,13 @@ export default defineEventHandler(async(event)=>{
                         }
                     }
                 }
-            }
+            },
+            role:true
         }
     })
-    return user
+    if(user!=null){
+        return user
+    }
+    
+    return null
 })

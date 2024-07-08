@@ -22,6 +22,7 @@ export default()=>{
                 us_password: user.us_password
             }
         })
+        sessionStorage.setItem('currentUser', JSON.stringify(result))
         return result
     }
     const deleteUser = async (user) => {    

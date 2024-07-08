@@ -11,7 +11,7 @@
             active-class="bg-gradient-to-br from-cyan-200 to-slate-700">
             Edit Pengumuman</NuxtLink>
         <!-- LOGOUT BUTTON -->
-        <div
+        <div @click="logout"
             class="flex w-full h-[35px] bg-gradient-to-br from-red-700 to-slate-800 rounded-md items-center justify-center text-cyan-50 hover:duration-1000  hover:bg-gradient-to-br hover:to-red-400 hover:from-slate-500 hover:cursor-pointer mt-auto">
             Logout
         </div>
@@ -19,5 +19,9 @@
 </template>
 
 <script setup>
-
+const logout = () => {
+    sessionStorage.removeItem('currentUser');
+    const router = useRouter();
+    router.push('/');
+}
 </script>

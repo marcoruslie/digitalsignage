@@ -26,9 +26,9 @@
             <div class="flex">
                 <div class="w-2/5 font-semibold border-b border-gray-300 py-2 px-4">Nama Kategori</div>
                 <div class="w-2/5 font-semibold border-b border-gray-300 py-2 px-4">Hak Akses</div>
-                <div class="w-1/5 font-semibold border-b border-gray-300 py-2 px-4">Durasi Per Pengumuman</div>
-                <div class="w-1/5 font-semibold border-b border-gray-300 py-2 px-4">Pengumuman Per List</div>
-                <div class="w-1/5 font-semibold border-b border-gray-300 py-2 px-4">Total Pengumuman</div>
+                <div class="w-1/5 font-semibold border-b border-gray-300 py-2 px-4">Durasi Per Konten</div>
+                <div class="w-1/5 font-semibold border-b border-gray-300 py-2 px-4">Konten Per List</div>
+                <div class="w-1/5 font-semibold border-b border-gray-300 py-2 px-4">Jumlah List Konten</div>
                 <div class="w-1/5 font-semibold border-b border-gray-300 py-2 px-4">-</div>
             </div>
             <div class="flex flex-col flex-grow overflow-auto">
@@ -43,14 +43,17 @@
                         </div>
                         <div v-else="data.categoryuser.length == 0">(NONE)</div>
                     </div>
-                    <div class="w-1/5 border-b border-gray-300 py-2 px-4 flex-col">{{ data.cat_duration }}</div>
-                    <div class="w-1/5 border-b border-gray-300 py-2 px-4 flex-col">{{ data.cat_qty }}</div>
-                    <div class="w-1/5 border-b border-gray-300 py-2 px-4">{{ data.listannouncement.length }}</div>
+                    <div class="w-1/5 border-b border-gray-300 py-2 px-4 flex-col">{{ data.cat_duration }} Detik</div>
+                    <div class="w-1/5 border-b border-gray-300 py-2 px-4 flex-col">{{ data.cat_qty }} Konten</div>
+                    <div class="w-1/5 border-b border-gray-300 py-2 px-4">{{ data.listannouncement.length }} List</div>
                     <div class="w-1/5 border-b border-gray-300 py-2 px-4 flex items-center">
                         <img src="/public/icon-edit.png" alt="" @click="toggleModalEdit(modalEditKategori, data)"
                             class="w-[60px] h-[60px] p-[10px] cursor-pointer hover:bg-slate-300 hover:duration-300 rounded-lg">
-                        <img src="/public/icon-delete.png" alt=""
-                            class="w-[60px] h-[60px] cursor-pointer hover:bg-slate-300 hover:duration-300 rounded-lg">
+                        <div
+                            class="relative w-14 h-8 rounded-full p-1 border-OnPrimaryContainer border-2 flex items-center bg-slate-200">
+                            <input type="checkbox" @click="deleteCategory(data.cat_id)" :checked="data.deletedAt == null"
+                                class="absolute w-6 h-6 rounded-full appearance-none cursor-pointer bg-white border-none checked:right-0 checked:left-6 transition-transform duration-1000 checked:bg-green-400">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -162,16 +165,13 @@
 </template>
 
 <script setup>
-import useUser from '~/composables/useUser';
 
-const { addCategory, getCategory, editCategory } = useCategory()
-const { getUser } = useUser()
+const { addCategory, getAllCategory, editCategory, setActiveCategory } = useCategory()
 // MODAL NOTIFICATION VARIABLE
 const modalHeader = ref('')
 const modalContent = ref('')
 const isOpen = ref(false)
-const listUser = ref(await getUser())
-const listCategory = ref(await getCategory())
+const listCategory = ref(await getAllCategory())
 const modalEditKategori = ref(false);
 const selectedUser = ref([]);
 
@@ -242,6 +242,20 @@ const editKategori = async () => {
         modalHeader.value = 'Gagal'
         modalContent.value = result.body.message
     }
+}
+const deleteCategory = async (data) => {
+    const result = await setActiveCategory(data)
+    if (result.statusCode == 200) {
+        isOpen.value = true
+        modalHeader.value = 'Berhasil'
+        modalContent.value = result.body.message
+    } else {
+        isOpen.value = true
+        modalHeader.value = 'Gagal'
+        modalContent.value = result.body.message
+    }
+
+
 }
 const toggleUser = (user) => {
     const data = {

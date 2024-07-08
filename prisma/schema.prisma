@@ -39,7 +39,6 @@ model Category{
   cat_duration Int
   createdAt DateTime @default(now())
   deletedAt DateTime?
-  templates Template_Object[]
   categoryuser Category_For_User[]
   listannouncement List_Announcement[]
 }
@@ -58,31 +57,40 @@ model List_Announcement{
   la_content String
   la_cat_id String
   category Category @relation(fields: [la_cat_id], references: [cat_id])
-  la_pl_id String
-  playlist Playlist @relation(fields: [la_pl_id], references: [pl_id])
   la_us_username String
   user User @relation(fields: [la_us_username], references: [us_username])
   createdAt DateTime @default(now())
   deletedAt DateTime?
   announcement_in_list Announcement_in_List[]
-}
-model Template_Object{
-  template_id String @id @default(uuid())
-  template_object String
-  template_x Int
-  template_y Int
-  template_cat_id String
-  category Category @relation(fields: [template_cat_id], references: [cat_id])
-  createdAt DateTime @default(now())
-  deletedAt DateTime?
+  list_in_playlist List_in_Playlist[]
 }
 model Playlist{
   pl_id String @id @default(uuid())
   pl_name String
   createdAt DateTime @default(now())
   deletedAt DateTime?
-  screen Screen[]
-  listannouncement List_Announcement[]
+  list_in_playlist List_in_Playlist[]
+  playlist_in_screen Playlist_in_Screen[]
+}
+model Playlist_in_Screen{
+  ps_id String @id @default(uuid())
+  ps_sc_id String
+  ps_pl_id String
+  ps_date_start DateTime
+  screen Screen @relation(fields: [ps_sc_id], references: [sc_id])
+  playlist Playlist @relation(fields: [ps_pl_id], references: [pl_id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
+
+}
+model List_in_Playlist{
+  lp_id String @id @default(uuid())
+  lp_pl_id String
+  lp_la_id String
+  playlist Playlist @relation(fields: [lp_pl_id], references: [pl_id],onDelete: Cascade)
+  listannouncement List_Announcement @relation(fields: [lp_la_id], references: [la_id])
+  createdAt DateTime @default(now())
+  deletedAt DateTime?
 }
 
 model Announcement_in_List{
@@ -99,6 +107,7 @@ model Announcement{
   an_id String @id @default(uuid())
   an_title String
   an_url String
+  an_type String
   createdAt DateTime @default(now())
   deletedAt DateTime?
   announcement_in_list Announcement_in_List[]
@@ -109,8 +118,7 @@ model Screen{
   sc_ip String
   sc_location String
   sc_name String
-  sc_pl_id String?
-  playlist Playlist? @relation(fields: [sc_pl_id], references: [pl_id])
+  playlist_in_screen Playlist_in_Screen[]
 }
 
 

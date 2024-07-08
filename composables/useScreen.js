@@ -15,6 +15,19 @@ export default () => {
         })
         return result
     }
+    const updateScreen = async (screen) => {
+        console.log(screen)
+        const result = await $fetch('/api/screenData/updateScreen', {
+            method: 'PUT',
+            body: {
+                sc_id: screen.sc_id,
+                sc_name: screen.sc_name,
+                sc_location: screen.sc_location,
+                sc_ip: screen.sc_ip
+            }
+        })
+        return result
+    }
     const deleteScreen = async (screen) => {
         const result = await $fetch('/api/screenData/deleteScreen', {
             method: 'DELETE',
@@ -27,6 +40,7 @@ export default () => {
     return {
         getScreen,
         createScreen,
-        deleteScreen
+        deleteScreen,
+        updateScreen
     }
 }

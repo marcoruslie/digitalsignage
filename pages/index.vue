@@ -30,36 +30,56 @@
         :isOpen="isOpen" />
 </template>
 <script setup>
+import useUser from '~/composables/useUser';
 
 
+const { loginUser } = useUser()
 const username = ref('');
 const password = ref('');
 const isOpen = ref(false);
 const modalHeader = ref('');
 const modalContent = ref('');
-const userData = {
-    username: 'admin',
-    password: 'admin'
-}
-onMounted(() => {
-    sessionStorage.setItem('currentUser',JSON.stringify(userData))
-})
-function login() {
+let currentUser;
+
+async function login() {
     if (username.value === 'admin' && password.value === 'admin') {
         modalHeader.value = 'Login Success';
         modalContent.value = 'Welcome Admin';
         isOpen.value = true;
     } else {
-        modalHeader.value = 'Login Failed';
-        modalContent.value = 'Username or Password is incorrect';
-        isOpen.value = true;
+        const user = {
+            us_username: username.value,
+            us_password: password.value
+        }
+        currentUser = await loginUser(user)
+        if(currentUser != null){
+            modalHeader.value = 'Login Success';
+            modalContent.value = `Welcome ${currentUser.us_username}`;
+            isOpen.value = true;
+        }
+        else{
+            modalHeader.value = 'Login Failed';
+            modalContent.value = 'Username or Password is incorrect';
+            isOpen.value = true;
+        }
     }
 }
 
 function modalFunction() {
     const router = useRouter();
     if (modalHeader.value == 'Login Success') {
-        router.push('Admin/MasterScreenPage')
+        if(currentUser!=null){
+            if(currentUser.role.role_name == 'Admin'){
+                router.push('Admin/MasterScreenPage')
+            }
+            else{
+                router.push('Biro/ListAnnouncementPage')
+            }
+        }
+        else{
+            router.push('Admin/MasterScreenPage')
+        }
+        isOpen.value = false;
     }
     else {
         isOpen.value = false;

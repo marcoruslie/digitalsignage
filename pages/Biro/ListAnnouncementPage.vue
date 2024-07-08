@@ -25,14 +25,21 @@
             </div>
             <div class="border-b-2 border-Primary mt-1"></div>
             <div class="flex-grow flex-col p-1 space-y-1">
-                <!-- List Playlist -->
-                <div v-for="(data, index) in dataPengumuman" @click="openModalQr(data.pengumuman_namafile)"
-                    class="h-[100px] w-full rounded shadow-xl hover:bg-slate-50 flex items-center justify-between space-x-3">
-                    <div class="flex items-center space-x-3">
+                <!-- List - List Pengumuman -->
+                <div v-for="(data, index) in dataListAnnouncement"
+                    class="h-[100px] w-full rounded shadow-xl flex items-center justify-between space-x-3 px-2">
+                    <div class="flex items-center space-x-3 justify-between w-full">
                         <!-- <div class="w-[100px] h-[100px] bg-PrimaryContainer rounded-l">
                                 <img :src="data.pengumuman_namafile" alt="">
                             </div> -->
-                        <div class="font-bold text-lg m-1">{{ data.pengumuman_judul }}</div>
+                        <div class="w-full">
+                            <div class="font-bold text-lg m-1">{{ data.la_title }}</div>
+                        </div>
+                        <div class="w-full flex justify-end">
+                            <img src="/icon_detail.png" @click="toggleModalShowListPengumuman(modalShowListPengumuman,data)"
+                                class="w-[50px] h-[50px] hover:bg-slate-200 rounded hover:duration-300">
+                        </div>
+
                     </div>
 
                 </div>
@@ -40,10 +47,60 @@
         </div>
 
     </div>
-
-    <div ref="modalAddListPengumuman"
+    <div ref="modalShowListPengumuman"
         class="hidden overflow-x-hidden flex fixed top-0 right-0 left-0 z-10 justify-center items-center h-screen bg-black bg-opacity-50">
         <div
+            class="p-4 w-3/4 max-w-6xl h-[calc(100vh-20px)] relative bg-white rounded-lg shadow sm:p-5 flex flex-col space-y-2">
+            <div class="flex justify-between items-center pb-4 rounded-t border-b">
+                <h3 class="text-lg font-semibold text-OnPrimaryContainer">
+                    List Pengumuman
+                </h3>
+                <svg @click="toggleModal(modalShowListPengumuman)" xmlns="http://www.w3.org/2000/svg"
+                    class="h-6 w-6 hover:cursor-pointer hover:bg-Primary hover:duration-500 hover:rounded-lg"
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+
+            </div>
+            <form @submit.prevent="tambahListPengumuman" class="flex-col flex-grow space-y-2 overflow-auto">
+                <div class="max-h-full">
+                    <div v-if="dataAnnouncementInList!=null" v-for="(data, index) in dataAnnouncementInList.announcement_in_list"
+                        class="h-[100px] w-full rounded shadow-xl hover:bg-slate-50 flex items-center justify-between space-x-3">
+                        <div class="flex justify-between items-center w-full space-x-3">
+                            <div class="font-bold text-lg m-1 w-full">{{ data.announcement.an_title }}</div>
+                            <div class="w-fit flex justify-end space-x-4">
+                                <button v-if="data.announcement.an_url.includes('sim.stts')" class="rounded bg-Primary text-OnPrimary text-center px-3 py-1"
+                                    @click="openModalQr(data.announcement.an_url)">
+                                    Detail
+                                </button>
+                                <button v-else-if="data.announcement.an_url.includes('drive.google')" class="rounded bg-Primary text-OnPrimary text-center px-3 py-1"
+                                    @click="openModalKegiatan(data.announcement.an_url)">
+                                    Detail
+                                </button>
+                                <button v-else class="rounded bg-Primary text-OnPrimary text-center px-3 py-1"
+                                    @click="openModalLowongan({link: data.announcement.an_url})">
+                                    Detail
+                                </button>
+                                <div @click="toggleSelection(data)"
+                                    class="relative w-14 h-8 rounded-full p-1 border-OnPrimaryContainer border-2 flex items-center bg-slate-200 cursor-pointer">
+                                    <input type="checkbox" v-on:click="toggleSelection(data)"
+                                        :checked="isSelected(data)"
+                                        class="absolute w-6 h-6 rounded-full appearance-none bg-white border-none checked:right-0 checked:left-6 transition-transform duration-1000 checked:bg-green-400"
+                                        disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <button
+                class="rounded bg-Primary text-center cursor-pointer px-6 py-2 text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-300">
+                Tambahkan</button>
+        </div>
+    </div>
+    <div ref="modalAddListPengumuman"
+        class="hidden overflow-x-hidden flex fixed top-0 right-0 left-0 z-10 justify-center items-center h-screen bg-black bg-opacity-50">
+        <form @submit.prevent="tambahListPengumuman"
             class="p-4 w-3/4 max-w-6xl h-[calc(100vh-20px)] relative bg-white rounded-lg shadow sm:p-5 flex flex-col space-y-2">
             <div class="flex justify-between items-center pb-4 rounded-t border-b">
                 <h3 class="text-lg font-semibold text-OnPrimaryContainer">
@@ -56,30 +113,44 @@
                 </svg>
 
             </div>
-            <div class="flex-col flex-grow space-y-2 overflow-auto">
+            <div  class="flex-col flex-grow space-y-2 overflow-auto">
                 <div class="flex flex-col space-y-2 text-OnPrimaryContainer">
                     <div class="flex flex-col">
                         <label for="listName">List Name</label>
-                        <input v-model="listName" type="text"
+                        <input v-model="listName" type="text" required
                             class="border-2 border-gray-500 hover:border-Primary rounded-md hover:duration-300 px-2 py-2">
                     </div>
-                    <select v-model="kategori" name="" id="">
-                        <option value="">Pilih Kategori Pengumuman</option>
-                        <option value="lowongan magang">Lowongan Magang</option>
-                        <option value="lowongan kerja">Lowongan Kerja</option>
-                        <option value="pengumuman kegiatan">Pengumuman Kegiatan</option>
-                        <option value="pengumuman kampus">Pengumuman Kampus</option>
-                        <option value="iklan">Iklan</option>
+                    <select v-model="kategori" name="" id="" required>
+                        <option value="">Pilih Kategori pengumuman</option>
+                        <option v-for="data in currentUser.categoryuser"
+                            :value="{ id: data.cu_cat_id, name: data.category.cat_name }">
+                            {{ data.category.cat_name }}
+                        </option>
                     </select>
                 </div>
-                <div class="max-h-full">
-                    <div v-if="kategori == 'pengumuman kampus'" v-for="(data, index) in dataPengumuman"
+                <div v-if="kategori != null" class="max-h-full">
+                    <div v-if="kategori.name.toUpperCase() == 'pengumuman kampus'.toUpperCase()"
+                        v-for="(data, index) in dataPengumuman"
                         class="h-[100px] w-full rounded shadow-xl hover:bg-slate-50 flex items-center justify-between space-x-3">
-                        <div class="flex items-center space-x-3" @click="">
-                            <div class="font-bold text-lg m-1">{{ data.pengumuman_judul }}</div>
+                        <div class="flex justify-between items-center w-full space-x-3">
+                            <div class="font-bold text-lg m-1 w-full">{{ data.pengumuman_judul }}</div>
+                            <div class="w-fit flex justify-end space-x-4">
+                                <button class="rounded bg-Primary text-OnPrimary text-center px-3 py-1"
+                                    @click="openModalQr(data.pengumuman_namafile)">
+                                    Detail
+                                </button>
+                                <div @click="toggleSelection(data)"
+                                    class="relative w-14 h-8 rounded-full p-1 border-OnPrimaryContainer border-2 flex items-center bg-slate-200 cursor-pointer">
+                                    <input type="checkbox" v-on:click="toggleSelection(data)"
+                                        :checked="isSelected(data)"
+                                        class="absolute w-6 h-6 rounded-full appearance-none bg-white border-none checked:right-0 checked:left-6 transition-transform duration-1000 checked:bg-green-400"
+                                        disabled>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div v-if="kategori.includes('lowongan')" v-for="(data, index) in filteredLowongan"
+                    <div v-if="kategori.name.toUpperCase().includes('LOWONGAN')"
+                        v-for="(data, index) in filteredLowongan"
                         class="h-[100px] w-full rounded shadow-xl hover:bg-slate-50 flex items-center justify-between space-x-3">
                         <div class="flex items-center space-x-3 w-full">
                             <div class="flex-col w-full">
@@ -94,18 +165,15 @@
                                         <div>Start : {{ data.lowongan_entried }} Deadline : {{ data.lowongan_deadline }}
                                         </div>
                                     </div>
-                                    <div class="w-full flex justify-center">
-                                        
-                                    </div>
                                     <div class="w-fit flex justify-end space-x-4">
-                                        <button class="rounded bg-Primary text-OnPrimary text-center px-3 py-1" 
+                                        <button class="rounded bg-Primary text-OnPrimary text-center px-3 py-1"
                                             @click="openModalLowongan(data)">
                                             Detail
                                         </button>
-                                        <div
-                                            class="relative w-14 h-8 rounded-full p-1 border-OnPrimaryContainer border-2 flex items-center bg-slate-200">
-                                            <input type="checkbox" @click="toggle"
-                                                class="absolute w-6 h-6 rounded-full appearance-none cursor-pointer bg-white border-none checked:right-0 checked:left-6 transition-transform duration-1000 checked:bg-green-400">
+                                        <div @click="toggleSelection(data)"
+                                            class="relative w-14 h-8 rounded-full p-1 border-OnPrimaryContainer border-2 flex items-center bg-slate-200 cursor-pointer">
+                                            <input type="checkbox" :checked="isSelected(data)" disabled
+                                                class="absolute w-6 h-6 rounded-full appearance-none bg-white border-none checked:right-0 checked:left-6 transition-transform duration-1000 checked:bg-green-400">
                                         </div>
                                     </div>
 
@@ -113,41 +181,96 @@
                             </div>
                         </div>
                     </div>
-                    <div v-if="kategori == 'pengumuman kegiatan'" v-for="(data, index) in dataLaporanBAK"
+                    <div v-if="kategori.name.toUpperCase() == 'pengumuman kegiatan'.toUpperCase()"
+                        v-for="(data, index) in dataLaporanBAK"
                         class="h-[100px] w-full rounded shadow-xl hover:bg-slate-50 flex items-center justify-between space-x-3">
-                        <div class="flex items-center space-x-3" @click="">
-                            <div>{{ index }}</div>
-                            <div class="font-bold text-lg m-1">{{ data.keg_nama }}</div>
+                        <div class="flex items-center space-x-3 w-full" @click="">
+                            <div class="flex-col w-full">
+                                <div class="font-bold text-lg m-1">{{ data.keg_nama }}</div>
+                                <div class="flex justify-between w-full items-center">
+                                    <div class="w-full">
+                                        <div>Organisasi : </div>
+                                        <div>{{ data.org_nama }}</div>
+                                    </div>
+                                    <div class="w-full">
+                                        <div>Lokasi : {{ data.keg_tempat }}</div>
+                                        <div>Start : {{ data.keg_tanggal_start }} Deadline : {{ data.keg_tanggal_end }}
+                                        </div>
+                                    </div>
+                                    <div class="w-fit flex justify-end space-x-4">
+                                        <button v-if="data.poster_preview_link != null"
+                                            class="rounded bg-Primary text-OnPrimary text-center px-3 py-1"
+                                            @click="openModalKegiatan(data)">
+                                            Detail
+                                        </button>
+                                        <div @click="toggleSelection(data)"
+                                            class="relative w-14 h-8 rounded-full p-1 border-OnPrimaryContainer border-2 flex items-center bg-slate-200 cursor-pointer">
+                                            <input type="checkbox" :checked="isSelected(data)" disabled
+                                                class="absolute w-6 h-6 rounded-full appearance-none bg-white border-none checked:right-0 checked:left-6 transition-transform duration-1000 checked:bg-green-400">
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div @click=""
+            <button type="submit"
                 class="rounded bg-Primary text-center cursor-pointer px-6 py-2 text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-300">
-                Simpan</div>
-        </div>
+                Tambahkan</button>
+        </form>
     </div>
     <ModalShowPengumuman :modalPengumuman="isModalPengumumanOpen" :imageUrl="imageUrl" :closeModal="closeModal" />
-
+    <NotificationModal :modalHeader="modalHeader" :modalContent="modalContent" :buttonFunction="buttonNotification"
+        :isOpen="isOpen" />
 
 </template>
 
 <script setup>
 
 const { getLaporanBAK, getPengumuman, getLowongan } = useDataISTTS();
-const { createPlaylist, deletePlaylist, getPlaylist } = usePlaylist();
+const { getCategory } = useCategory()
+const { getListAnnouncement, addListAnnouncement } = useAnnouncement();
+const modalHeader = ref('')
+const modalContent = ref('')
+const isOpen = ref(false)
+const buttonNotification = () => {
+    isOpen.value = false
+    const router = useRouter()
+    router.go()
+}
 const isModalPengumumanOpen = ref(false)
 const modalAddListPengumuman = ref(null)
-
+const modalShowListPengumuman = ref(null) 
+// const pengumumanRes = await getPengumuman()
 const [pengumumanRes, lowonganRes, laporanBAKRes] = await Promise.all([getPengumuman(), getLowongan(), getLaporanBAK()])
 const dataPengumuman = pengumumanRes.response
 const dataLowongan = lowonganRes.response
 const dataLaporanBAK = laporanBAKRes.response
-
+const dataListAnnouncement = ref(await getListAnnouncement())
+const dataAnnouncementInList = ref(null)
 const listName = ref('')
-const kategori = ref('')
-
-const imageUrl = ref('');
+const kategori = ref(null)
+const currentUser = ref([])
+const imageUrl = ref(null);
+const selectedItems = ref([]);
+onMounted(async () => {
+    currentUser.value = JSON.parse(sessionStorage.getItem('currentUser'))
+})
+watch(kategori, () => {
+    selectedItems.value = []
+})
+const toggleModalShowListPengumuman = (modal, data) => {
+    toggleModal(modal)
+    if(modal.classList.contains('hidden')){
+        dataAnnouncementInList.value = null
+    }
+    else{
+        dataAnnouncementInList.value = data
+    
+    }
+}
 const toggleModal = (modal) => {
     modal.classList.toggle('hidden')
 }
@@ -159,11 +282,16 @@ const openModalLowongan = (data) => {
     isModalPengumumanOpen.value = !isModalPengumumanOpen.value
     imageUrl.value = data.link
 }
+const openModalKegiatan = (data) => {
+    isModalPengumumanOpen.value = !isModalPengumumanOpen.value
+    const link = `https://drive.google.com/thumbnail?id=${data.poster_link}`
+    imageUrl.value = link
+}
 const closeModal = () => {
     isModalPengumumanOpen.value = !isModalPengumumanOpen.value
 }
 const filteredLowongan = computed(() => {
-    if (kategori.value == "lowongan magang") {
+    if (kategori.value.name.toUpperCase() == "LOWONGAN MAGANG") {
         return dataLowongan.filter((item) => item.lowongan_judul == "Lowongan Magang")
     }
     else {
@@ -172,6 +300,74 @@ const filteredLowongan = computed(() => {
 })
 const convertPDFtoQrCode = (pdfUrl) => {
     imageUrl.value = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${pdfUrl}`;
+}
+const toggleSelection = (data) => {
+    const index = selectedItems.value.indexOf(data);
+    if (index !== -1) {
+        selectedItems.value.splice(index, 1);
+    } else {
+        const category = currentUser.value.categoryuser.find((item) => item.cu_cat_id == kategori.value.id)
+        if (category.category.cat_qty > selectedItems.value.length) {
+            selectedItems.value.push(data);
+
+        }
+        else {
+            openNotif("Error", "Jumlah pengumuman sudah mencapai limit")
+
+        }
+    }
+}
+const openNotif = (header, content) => {
+    modalHeader.value = header
+    modalContent.value = content
+    isOpen.value = true
+
+}
+const isSelected = (data) => {
+    return selectedItems.value.includes(data);
+};
+const tambahListPengumuman = async () => {
+    let dataItem;
+    if (kategori.value.name.toUpperCase() == 'pengumuman kampus'.toUpperCase()) {
+        dataItem = selectedItems.value.map(item => {
+            return {
+                an_id: item.pengumuman_kode,
+                an_title: item.pengumuman_judul,
+                an_url: item.pengumuman_namafile,
+                an_type: 'PDF'
+            }
+        })
+    }
+    else if (kategori.value.name.toUpperCase() == 'pengumuman kegiatan'.toUpperCase()) {
+        dataItem = selectedItems.value.map(item => {
+            return {
+                an_id: item.keg_kode,
+                an_title: item.keg_nama,
+                an_url: item.poster_link,
+                an_type: 'IMAGE'
+            }
+        })
+    }
+    else {
+        dataItem = selectedItems.value.map(item => {
+            return {
+                an_id: item.lowongan_id,
+                an_title: `${item.perusahaan_nama} ${item.lowongan_judul}`,
+                an_url: item.link,
+                an_type: 'IMAGE'
+            }
+        })
+    }
+    const data = {
+        listName: listName.value,
+        kategori: kategori.value.id,
+        currentUser: currentUser.value.us_username,
+        announcements: dataItem
+    }
+    
+    const result = await addListAnnouncement(data)
+    openNotif('Berhasil', result.body.message)
+    
 }
 
 </script>
