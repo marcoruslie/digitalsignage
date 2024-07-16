@@ -20,7 +20,6 @@ model User {
   role Role @relation(fields: [us_role_id], references: [role_id])
   createdAt DateTime @default(now())
   deletedAt DateTime?
-  categoryuser Category_For_User[]
   listannouncement List_Announcement[]
 }
 
@@ -29,6 +28,7 @@ model Role {
   role_name String
   createdAt DateTime @default(now())
   deletedAt DateTime?
+  categoryuser Category_For_User[]
   user User[]
 }
 
@@ -45,10 +45,10 @@ model Category{
 model Category_For_User{
   cu_id String @id @default(uuid())
   cu_cat_id String
-  cu_us_username String
+  cu_role_id String
   createdAt DateTime @default(now())
   deletedAt DateTime?
-  user User @relation(fields: [cu_us_username], references: [us_username])
+  role Role @relation(fields: [cu_role_id], references: [role_id])
   category Category @relation(fields: [cu_cat_id], references: [cat_id])
 }
 model List_Announcement{

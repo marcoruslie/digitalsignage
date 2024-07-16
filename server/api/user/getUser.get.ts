@@ -6,7 +6,8 @@ export default defineEventHandler(async(event)=>{
                 select:{
                     role_name:true
                 }
-            }
+            },
+            listannouncement:true
         }
     })
     return result
