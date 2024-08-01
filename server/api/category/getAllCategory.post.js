@@ -46,13 +46,7 @@ export default defineEventHandler(async (event) => {
 				createdAt: "asc",
 			},
 		})
-		return {
-			statusCode: 200,
-			body: {
-				message: "Categories fetched successfully",
-				data: result,
-			},
-		}
+		return result
 	} catch (e) {
 		return {
 			statusCode: 400,

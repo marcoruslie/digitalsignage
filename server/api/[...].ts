@@ -16,29 +16,41 @@ io.on("connection", async (socket) => {
     size: io.engine.clientsCount,
     siezeArray: listSocket.length,
   });
-  // EVENT FROM CLIENT
+  // 1. EVENT FROM CLIENT
   socket.on("clientType", async (clientType) => {
     if ((await io.in(clientType).fetchSockets()).length > 0){
       io.socketsLeave(clientType);
     }
     socket.join(clientType);
   });
-  // EVENT FROM CLIENT ('SERVER')
-  socket.on("changeTemplate",(data)=>{
-    io.to(data.ip).emit("changeTemplate", { template: data.template });
-  })
-  // EVENT REQUEST DATA PLAYLIST
-  // CLIENT SERVER -> CLIENT
+  
+  
+  // 1. CLIENT (SERVER) -> SERVER -> CLIENT
+  // event request data playlist
   socket.on("reqDataPlaylist",(data)=>{
     io.to(data.ip).emit("reqDataPlaylist");
   })
-  // CLIENT -> CLIENT SERVER
+  // event change template
+  socket.on("changeTemplate",(data)=>{
+    io.to(data.ip).emit("changeTemplate", { template: data.template });
+  })
+  // event change bgm
+  socket.on("changeBgm",(data)=>{
+    io.to(data.ip).emit("changeBgm", { bgm: data.bgm });
+  })
+
+  // 2. CLIENT -> SERVER -> CLIENT (SERVER)
+  // event response data playlist
   socket.on("resDataPlaylist",(data)=>{
     io.to("server").emit("resDataPlaylist", { data: data });
   })
+
   
-  // EVENT TO CLIENT ('RASPBERRY')
+  // 3. EVENT TO CLIENT ('RASPBERRY')
   socket.emit("tes", { message: "Connection Established!" });
+  setInterval(() => {
+    socket.emit("playMusic", { message: "Connection Established!" });
+  }, 10000);
   socket.on("disconnect", () => {
     const index = listSocket.findIndex(
       (item: any) => item.socket_ip === socket.handshake.headers.origin

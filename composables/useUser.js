@@ -19,6 +19,15 @@ export default () => {
 		})
 		return result
 	}
+	const deleteRole = async (role) => {
+		const result = await $fetch("/api/user/deleteRole", {
+			method: "DELETE",
+			body: {
+				role_id: role.role_id,
+			},
+		})
+		return result
+	}
 	const getUser = async () => {
 		const result = await $fetch("/api/user/getUser")
 		return result
@@ -42,7 +51,7 @@ export default () => {
 		const result = await $fetch("/api/user/deleteUser", {
 			method: "DELETE",
 			body: {
-				us_id: user.us_id,
+				us_username: user.us_username,
 			},
 		})
 		return result
@@ -54,5 +63,6 @@ export default () => {
 		deleteUser,
 		getRole,
 		createRole,
+		deleteRole
 	}
 }

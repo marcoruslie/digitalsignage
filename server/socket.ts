@@ -1,27 +1,38 @@
 import { Server, type ServerOptions } from "socket.io";
 import type { H3Event } from "h3";
-import {prisma} from './db/index'
-const getIpUser = async ()=>{
-    const screen = await prisma.screen.findMany({
-        select:{
-            sc_ip: true
-        }
-    })
-    return screen.map(entry => entry.sc_ip)
-}
-const options: Partial<ServerOptions> = {
-    path: '/api/socket.io',
-    cors:{
-        origin: [],
-        methods: ["GET", "POST"]
+import { prisma } from './db/index';
+
+const getIpUser = async () => {
+  const screen = await prisma.screen.findMany({
+    select: {
+      sc_ip: true,
     },
-}
+  });
+  return screen.map((entry) => entry.sc_ip);
+};
+
+const options: Partial<ServerOptions> = {
+  path: '/api/socket.io',
+  cors: {
+    origin: [],
+    methods: ["GET", "POST"],
+  },
+};
+
 export const io = new Server(options);
-export async function initSocket(event: H3Event){
-    options.cors = {
-        origin: await getIpUser(),
-    }
-    console.log(options.cors)
-    // @ts-ignore
-    io.attach(event.node.res.socket?.server)
+
+const updateCorsOptions = async () => {
+  const ipUsers = await getIpUser();
+  io.opts.cors.origin = ipUsers;
+  console.log('Updated CORS options:', io.opts.cors);
+};
+
+io.use(async (socket, next) => {
+  await updateCorsOptions();
+  next();
+});
+
+export async function initSocket(event: H3Event) {
+  // @ts-ignore
+  io.attach(event.node.res.socket?.server);
 }

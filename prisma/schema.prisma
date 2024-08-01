@@ -41,6 +41,7 @@ model Category{
   deletedAt DateTime?
   categoryuser Category_For_User[]
   listannouncement List_Announcement[]
+  announcement Announcement[]
 }
 model Category_For_User{
   cu_id String @id @default(uuid())
@@ -48,8 +49,8 @@ model Category_For_User{
   cu_role_id String
   createdAt DateTime @default(now())
   deletedAt DateTime?
-  role Role @relation(fields: [cu_role_id], references: [role_id])
-  category Category @relation(fields: [cu_cat_id], references: [cat_id])
+  role Role @relation(fields: [cu_role_id], references: [role_id], onDelete: Cascade)
+  category Category @relation(fields: [cu_cat_id], references: [cat_id], onDelete: Cascade)
 }
 model List_Announcement{
   la_id String @id @default(uuid())
@@ -58,7 +59,7 @@ model List_Announcement{
   la_cat_id String
   category Category @relation(fields: [la_cat_id], references: [cat_id])
   la_us_username String
-  user User @relation(fields: [la_us_username], references: [us_username])
+  user User @relation(fields: [la_us_username], references: [us_username], onDelete: Cascade)
   createdAt DateTime @default(now())
   deletedAt DateTime?
   announcement_in_list Announcement_in_List[]
@@ -108,9 +109,11 @@ model Announcement{
   an_title String
   an_url String
   an_type String
+  an_cat_id String
   createdAt DateTime @default(now())
   deletedAt DateTime?
   announcement_in_list Announcement_in_List[]
+  category Category @relation(fields: [an_cat_id], references: [cat_id])
 }
 
 model Screen{

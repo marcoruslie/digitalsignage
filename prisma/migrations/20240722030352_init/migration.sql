@@ -35,7 +35,7 @@ CREATE TABLE `Category` (
 CREATE TABLE `Category_For_User` (
     `cu_id` VARCHAR(191) NOT NULL,
     `cu_cat_id` VARCHAR(191) NOT NULL,
-    `cu_us_username` VARCHAR(191) NOT NULL,
+    `cu_role_id` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `deletedAt` DATETIME(3) NULL,
 
@@ -105,6 +105,7 @@ CREATE TABLE `Announcement` (
     `an_title` VARCHAR(191) NOT NULL,
     `an_url` VARCHAR(191) NOT NULL,
     `an_type` VARCHAR(191) NOT NULL,
+    `an_cat_id` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `deletedAt` DATETIME(3) NULL,
 
@@ -125,7 +126,7 @@ CREATE TABLE `Screen` (
 ALTER TABLE `User` ADD CONSTRAINT `User_us_role_id_fkey` FOREIGN KEY (`us_role_id`) REFERENCES `Role`(`role_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Category_For_User` ADD CONSTRAINT `Category_For_User_cu_us_username_fkey` FOREIGN KEY (`cu_us_username`) REFERENCES `User`(`us_username`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Category_For_User` ADD CONSTRAINT `Category_For_User_cu_role_id_fkey` FOREIGN KEY (`cu_role_id`) REFERENCES `Role`(`role_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Category_For_User` ADD CONSTRAINT `Category_For_User_cu_cat_id_fkey` FOREIGN KEY (`cu_cat_id`) REFERENCES `Category`(`cat_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -153,3 +154,6 @@ ALTER TABLE `Announcement_in_List` ADD CONSTRAINT `Announcement_in_List_ail_an_i
 
 -- AddForeignKey
 ALTER TABLE `Announcement_in_List` ADD CONSTRAINT `Announcement_in_List_ail_la_id_fkey` FOREIGN KEY (`ail_la_id`) REFERENCES `List_Announcement`(`la_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Announcement` ADD CONSTRAINT `Announcement_an_cat_id_fkey` FOREIGN KEY (`an_cat_id`) REFERENCES `Category`(`cat_id`) ON DELETE RESTRICT ON UPDATE CASCADE;

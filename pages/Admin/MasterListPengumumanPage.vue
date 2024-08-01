@@ -1,7 +1,7 @@
 <template>
 	<div class="bg-cyan-700 h-svh w-full p-2 flex space-x-3">
 		<div class="flex flex-col h-full w-[20%] bg-white rounded-xl p-2 space-y-2">
-			<NavbarBiro />
+			<Navbar />
 		</div>
 		<div class="h-full w-[80%] bg-white rounded-xl p-2 flex-col overflow-auto">
 			<div class="flex justify-between items-center">
@@ -30,7 +30,7 @@
 						src="/public/icon-add.png"
 						alt=""
 						class="w-[40px] cursor-pointer hover:bg-slate-300 hover:duration-300 rounded-lg"
-						@click="toggleModal(modalAddListPengumuman)" />
+						@click="toggleModal(modalListPengumuman)" />
 				</div>
 			</div>
 			<div class="border-b-2 border-Primary mt-1"></div>
@@ -134,8 +134,7 @@
 	</div>
 	<!-- Modal add list pengumuman -->
 	<div
-		ref="modalAddListPengumuman"
-		v-if="currentUser != null"
+		ref="modalListPengumuman"
 		class="hidden overflow-x-hidden flex fixed top-0 right-0 left-0 z-10 justify-center items-center h-screen bg-black bg-opacity-50">
 		<form
 			@submit.prevent="tambahListPengumuman"
@@ -143,7 +142,7 @@
 			<div class="flex justify-between items-center pb-4 rounded-t border-b">
 				<h3 class="text-lg font-semibold text-OnPrimaryContainer">Tambah List Pengumuman</h3>
 				<svg
-					@click="toggleModal(modalAddListPengumuman)"
+					@click="toggleModal(modalListPengumuman)"
 					xmlns="http://www.w3.org/2000/svg"
 					class="h-6 w-6 hover:cursor-pointer hover:bg-Primary hover:duration-500 hover:rounded-lg"
 					fill="none"
@@ -174,9 +173,9 @@
 						required>
 						<option value="">Pilih Kategori pengumuman</option>
 						<option
-							v-for="data in currentUser.role.categoryuser"
-							:value="{ id: data.cu_cat_id, name: data.category.cat_name }">
-							{{ data.category.cat_name }}
+							v-for="data in listCategory"
+							:value="{ id: data.cat_id, name: data.cat_name }">
+							{{ data.cat_name }}
 						</option>
 					</select>
 				</div>
@@ -315,11 +314,13 @@
 
 <script setup>
 	const { getLaporanBAK, getPengumuman, getLowongan } = useDataISTTS()
-	const { getCategory } = useCategory()
+
+	const { getAllCategory } = useCategory()
 	const { getListAnnouncement, addListAnnouncement } = useAnnouncement()
 	const modalHeader = ref("")
 	const modalContent = ref("")
 	const isOpen = ref(false)
+	const listCategory = ref(await getAllCategory())
 	const buttonNotification = () => {
 		isOpen.value = false
 		if (modalHeader.value == "Berhasil") {
@@ -328,7 +329,7 @@
 		}
 	}
 	const isModalPengumumanOpen = ref(false)
-	const modalAddListPengumuman = ref(null)
+	const modalListPengumuman = ref(null)
 	const modalShowListPengumuman = ref(null)
 	// const pengumumanRes = await getPengumuman()
 	const [pengumumanRes, lowonganRes, laporanBAKRes] = await Promise.all([
@@ -362,7 +363,6 @@
 		}
 	}
 	const toggleModal = (modal) => {
-		console.log(modal)
 		modal.classList.toggle("hidden")
 	}
 	const openModalQr = (pdfUrl) => {

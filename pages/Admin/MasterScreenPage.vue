@@ -6,30 +6,49 @@
 		<div class="h-full w-[80%] bg-white rounded-xl flex-col p-2">
 			<div class="flex justify-between items-center">
 				<div class="text-Primary font-bold text-2xl">Daftar Monitor</div>
+				<div class="flex space-x-1">
+					<button
+						@click="toggleModal(modalSetBGM)"
+						class="p-2 bg-Primary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer text-white rounded">
+						Add BGM
+					</button>
+				</div>
 			</div>
 			<div class="border-b-2 border-Primary mt-1"></div>
+
 			<div class="flex flex-wrap m-1">
 				<div
 					v-for="screen in listScreen"
-					class="bg-Primary h-[260px] w-[260px] rounded flex flex-col items-center justify-center cursor-pointer hover:shadow-2xl hover:bg-OnPrimaryContainer text-OnPrimary mx-1"
-					@click="toggleModal(modalScreen, screen)">
-					<img
-						src="\Monitor.png"
-						alt="" />
-					<div>{{ screen.sc_name }}</div>
-					<div>{{ screen.sc_location }}</div>
-					<div>{{ screen.sc_ip }}</div>
+					class="h-[260px] w-[260px] rounded mx-1 space-y-1">
+					<div
+						class="bg-Primary h-[225px] w-[260px] rounded flex flex-col items-center justify-center cursor-pointer hover:shadow-2xl hover:bg-OnPrimaryContainer text-OnPrimary"
+						@click="toggleModal(modalScreen, screen)">
+						<img
+							src="\Monitor.png"
+							alt="" />
+						<div>{{ screen.sc_name }}</div>
+						<div>{{ screen.sc_location }}</div>
+						<div>{{ screen.sc_ip }}</div>
 
-					<div v-if="screen.playlist != null">
-						{{ screen.playlist.pl_name }}
-					</div>
-					<div class="flex">
-						Status :
-						<div :class="statusClass(screen.sc_ip)">
-							{{ statusText(screen.sc_ip) }}
+						<div v-if="screen.playlist != null">
+							{{ screen.playlist.pl_name }}
+						</div>
+						<div class="flex">
+							Status :
+							<div :class="statusClass(screen.sc_ip)">
+								{{ statusText(screen.sc_ip) }}
+							</div>
 						</div>
 					</div>
+					<div
+						class="bg-Primary h-[30px] w-[260px] rounded flex flex-col items-center justify-center cursor-pointer hover:shadow-2xl hover:bg-OnPrimaryContainer text-OnPrimary"
+						@mouseover="isHoveredCurrentMusic[screen.sc_id] = true"
+						@mouseleave="isHoveredCurrentMusic[screen.sc_id] = false">
+						<div v-if="!isHoveredCurrentMusic[screen.sc_id]">Current Music : TES</div>
+						<marquee v-else>Current Music : TES</marquee>
+					</div>
 				</div>
+
 				<div
 					class="bg-Primary h-[260px] w-[260px] rounded flex flex-col items-center justify-center mx-1 cursor-pointer hover:shadow-2xl hover:bg-OnPrimaryContainer text-OnPrimary"
 					@click="toggleModal(modalAddScreen)">
@@ -66,7 +85,7 @@
 				v-if="currentScreen != null"
 				:src="currentScreen.sc_ip + '/preview'"
 				width="70%"
-				height="600px"
+				height="800px"
 				frameborder="2"
 				sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
 				style="pointer-events: none"
@@ -405,6 +424,126 @@
 			</button>
 		</form>
 	</div>
+	<!-- MODAL SET BGM -->
+	<div
+		ref="modalSetBGM"
+		class="hidden overflow-x-hidden flex fixed top-0 right-0 left-0 z-10 justify-center items-center h-screen bg-black bg-opacity-50">
+		<div class="p-4 w-1/2 max-w-6xl h-3/6/6 relative bg-white rounded-lg shadow sm:p-5 flex flex-col space-y-2">
+			<div class="flex justify-between items-center pb-4 rounded-t border-b">
+				<h3 class="text-lg font-semibold text-OnPrimaryContainer">Select BGM</h3>
+				<h1>{{ currentVideoId }}</h1>
+				<svg
+					@click="toggleModal(modalSetBGM)"
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-6 w-6 hover:cursor-pointer hover:bg-Primary hover:duration-500 hover:rounded-lg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor">
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M6 18L18 6M6 6l12 12" />
+				</svg>
+			</div>
+			<div class="flex flex-col flex-grow space-y-2 overflow-auto">
+				<div class="flex w-full space-x-1">
+					<input
+						type="text"
+						v-model="searchQuery"
+						class="rounded border-2 border-gray-500 hover:border-Primary px-2 py-2 w-[90%]"
+						placeholder="Search..." />
+					<button
+						@click="searchVideos"
+						class="rounded bg-Primary text-OnPrimary px-2 py-2 hover:bg-PrimaryContainer hover:text-OnPrimaryContainer w-[10%]">
+						Search
+					</button>
+				</div>
+				<ul>
+					<li
+						v-for="video in searchResults"
+						:key="video.id.videoId"
+						@click="selectVideo(video.id.videoId)"
+						class="cursor-pointer hover:bg-gray-200 p-2">
+						{{ video.snippet.title }}
+					</li>
+				</ul>
+				<div class="flex w-full items-center justify-center">
+					<div
+						id="player"
+						class=""></div>
+				</div>
+			</div>
+			<button
+				@click="toggleModal(modalMonitorBGM)"
+				class="rounded bg-Primary text-center cursor-pointer px-6 py-2 text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-300">
+				Lanjut
+			</button>
+		</div>
+	</div>
+	<!-- MODAL SELECT MONITOR TO PLAY BGM -->
+	<div
+		ref="modalMonitorBGM"
+		class="hidden overflow-x-hidden flex fixed top-0 right-0 left-0 z-10 justify-center items-center h-screen bg-black bg-opacity-50">
+		<div class="p-4 w-1/2 max-w-6xl h-3/6/6 relative bg-white rounded-lg shadow sm:p-5 flex flex-col space-y-2">
+			<div class="flex justify-between items-center pb-4 rounded-t border-b">
+				<h3 class="text-lg font-semibold text-OnPrimaryContainer">Select Monitor</h3>
+				<h1>{{ selectedScreen }}</h1>
+				<svg
+					@click="toggleModal(modalMonitorBGM)"
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-6 w-6 hover:cursor-pointer hover:bg-Primary hover:duration-500 hover:rounded-lg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor">
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M6 18L18 6M6 6l12 12" />
+				</svg>
+			</div>
+			<div class="flex flex-wrap flex-grow overflow-auto items-center justify-center">
+				<div
+					v-for="screen in listScreen.filter((screen) => statusText(screen.sc_ip) == 'Online')"
+					class="h-[260px] w-[260px] rounded mx-1 space-y-1">
+					<div
+						class="h-[225px] w-[260px] rounded flex flex-col items-center justify-center cursor-pointer hover:shadow-2xl hover:bg-OnPrimaryContainer text-OnPrimary"
+						:class="selectedScreen[screen.sc_id] ? 'bg-OnPrimaryContainer' : 'bg-Primary'"
+						@click="toggleSelectScreen(screen)">
+						<img
+							src="\Monitor.png"
+							alt="" />
+						<div>{{ screen.sc_name }}</div>
+						<div>{{ screen.sc_location }}</div>
+						<div>{{ screen.sc_ip }}</div>
+
+						<div v-if="screen.playlist != null">
+							{{ screen.playlist.pl_name }}
+						</div>
+						<div class="flex">
+							Status :
+							<div :class="statusClass(screen.sc_ip)">
+								{{ statusText(screen.sc_ip) }}
+							</div>
+						</div>
+					</div>
+					<div
+						class="bg-Primary h-[30px] w-[260px] rounded flex flex-col items-center justify-center cursor-pointer hover:shadow-2xl hover:bg-OnPrimaryContainer text-OnPrimary"
+						@mouseover="isHoveredCurrentMusic[screen.sc_id] = true"
+						@mouseleave="isHoveredCurrentMusic[screen.sc_id] = false">
+						<marquee v-if="isHoveredCurrentMusic[screen.sc_id]"> Current Music : TES</marquee>
+						<div v-else-if="!isHoveredCurrentMusic[screen.sc_id]">Current Music : TES</div>
+					</div>
+				</div>
+			</div>
+			<button
+				@click="changeBGM"
+				class="rounded bg-Primary text-center cursor-pointer px-6 py-2 text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-300">
+				Pasang BGM
+			</button>
+		</div>
+	</div>
 	<NotificationModal
 		:modal-header="modalHeader"
 		:modal-content="modalContent"
@@ -418,7 +557,21 @@
 	const { sendMessage, refreshConnectedClient, getCLient } = useSocket()
 	const { createScreen, deleteScreen, getScreen, updateScreen } = useScreen()
 	const listScreen = ref(await getScreen())
+	const isHoveredCurrentMusic = ref({})
+	onBeforeMount(async () => {
+		for (let i = 0; i < listScreen.value.length; i++) {
+			isHoveredCurrentMusic.value[listScreen.value[i].sc_id] = false
+		}
+	})
 	const currentScreen = ref(null)
+	const selectedScreen = ref({})
+	const toggleSelectScreen = (screen) => {
+		if (selectedScreen.value[screen.sc_id]) {
+			delete selectedScreen.value[screen.sc_id]
+		} else {
+			selectedScreen.value[screen.sc_id] = screen
+		}
+	}
 	// VAR PLAYLIST
 	const listPlaylist = ref(await getPlaylist())
 	const router = useRouter()
@@ -428,6 +581,8 @@
 	const modalPlaylist = ref(null)
 	const modalEditScreen = ref(null)
 	const modalChangeTemplate = ref(null)
+	const modalSetBGM = ref(null)
+	const modalMonitorBGM = ref(null)
 	// SCREEN VAR
 	const screenIP = ref("")
 	const screenName = ref("")
@@ -450,7 +605,11 @@
 		modalContent = content
 		isOpen.value = true
 	}
-
+	// YOUTUBE API VAR
+	const searchQuery = ref("")
+	const searchResults = ref([])
+	const currentVideoId = ref("")
+	let youtubePlayer
 	const isDropdownOpen = ref([])
 	const toggleDropDown = (idx) => {
 		isDropdownOpen.value[idx] = !isDropdownOpen.value[idx]
@@ -481,6 +640,7 @@
 		const year = String(dateObject.getFullYear()).substring(2)
 		return `${day}${month}${year}`
 	}
+	// FUNCTION TO SHOW DETAIL LIST SCREEN
 	const listClient = ref(await getCLient())
 	const statusText = (sc_ip) => {
 		return listClient.value.some((client) => client.socket_ip === sc_ip) ? "Online" : "Offline"
@@ -493,6 +653,15 @@
 		path: "/api/socket.io",
 	})
 	onMounted(async () => {
+		const tag = document.createElement("script")
+		tag.src = "https://www.youtube.com/iframe_api"
+		const firstScriptTag = document.getElementsByTagName("script")[0]
+		firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
+
+		// Wait for the API to be ready before creating the player
+		window.onYouTubeIframeAPIReady = () => {
+			createPlayer()
+		}
 		isDropdownOpen.value.push(false)
 
 		socket.on("connect", () => {
@@ -534,6 +703,8 @@
 			screenPlaylist.value.push(playlist)
 		}
 	}
+
+	// FUNCTION PASS TO SOCKET
 	const uploadPlaylistFile = () => {
 		alert(screenPlaylist.value)
 	}
@@ -543,6 +714,15 @@
 			ip: currentScreen.value.sc_ip,
 		})
 	}
+	const changeBGM = () => {
+		selectedScreen.value.forEach((element) => {
+			socket.emit("changeBGM", {
+				bgm: currentVideoId.value,
+				ip: element.sc_ip,
+			})
+		})
+	}
+	// FUNCTION MODAL
 	const toggleModal = (modal, screen) => {
 		modal.classList.toggle("hidden")
 		if (modalScreen.value.classList.contains("hidden")) {
@@ -564,6 +744,7 @@
 		screenLocation.value = currentScreen.value.sc_location
 		screenIP.value = currentScreen.value.sc_ip
 	}
+	// FUNCTION CRUD SCREEN
 	const editScreen = async () => {
 		const data = {
 			sc_id: currentScreen.value.sc_id,
@@ -593,5 +774,52 @@
 			.catch((err) => {
 				openNotif("Error", err)
 			})
+	}
+	// FUNCTION YOUTUBE API
+	const createPlayer = () => {
+		youtubePlayer = new YT.Player("player", {
+			height: "315",
+			width: "560",
+			videoId: "", // Start with no video
+			playerVars: {
+				loop: 1,
+			},
+			events: {
+				onReady: onPlayerReady,
+				onStateChange: onPlayerStateChange,
+			},
+		})
+	}
+	const onPlayerReady = (event) => {
+		// Do nothing initially
+	}
+	const onPlayerStateChange = (event) => {
+		// Loop the video when it ends
+		if (event.data === YT.PlayerState.ENDED) {
+			youtubePlayer.playVideo()
+		}
+	}
+	const searchVideos = async () => {
+		const apiKey = "AIzaSyAgnyIHF_beLeYFv8XDCPz62vnCxm8TcPA"
+		const query = searchQuery.value
+		const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
+			query
+		)}&type=video&key=${apiKey}`
+
+		try {
+			const response = await fetch(searchUrl)
+			const data = await response.json()
+			searchResults.value = data.items
+		} catch (error) {
+			console.error("Error:", error)
+		}
+	}
+	const selectVideo = (videoId) => {
+		currentVideoId.value = videoId
+		if (youtubePlayer) {
+			youtubePlayer.loadVideoById(videoId)
+			youtubePlayer.setPlaybackQuality("tiny")
+			youtubePlayer.playVideo()
+		}
 	}
 </script>

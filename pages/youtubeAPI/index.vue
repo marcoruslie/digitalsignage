@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Spotify API</h1>
+    <h1>Youtube API</h1>
     <input type="text" v-model="searchQuery" @input="searchMusic">
     <ul>
       <li v-for="track in searchResults" :key="track.id" @click="playTrack(track)" class="cursor-pointer">

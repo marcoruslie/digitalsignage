@@ -7,25 +7,6 @@
 			<div class="flex justify-between items-center">
 				<div class="text-Primary font-bold text-2xl">Daftar Kategori</div>
 				<div class="flex items-center">
-					<div class="relative">
-						<input
-							type="text"
-							placeholder="Search..."
-							class="block w-full py-2 pl-10 pr-4 leading-tight bg-white border border-gray-300 rounded focus:outline-none focus:bg-white focus:border-gray-500" />
-						<div class="absolute inset-y-0 left-0 flex items-center pl-3">
-							<svg
-								class="h-6 w-6 text-gray-500"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M15 15l5 5M10 14a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0 0a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
-							</svg>
-						</div>
-					</div>
 					<img
 						src="/public/icon-add.png"
 						alt=""
@@ -46,7 +27,7 @@
 				<!-- Sample row -->
 				<div
 					class="flex hover:bg-slate-200 hover:duration-300 hover:cursor-pointer"
-					v-for="data in listCategory.body.data">
+					v-for="data in listCategory">
 					<div class="w-2/5 border-b border-gray-300 py-2 px-4">{{ data.cat_name }}</div>
 					<div class="w-2/5 border-b border-gray-300 py-2 px-4 flex-col">
 						<div
@@ -290,16 +271,17 @@
 			cat_duration: categoryDuration.value,
 			user: selectedUser.value,
 		}
-		const result = await editCategory(data)
-		if (result.statusCode == 200) {
-			isOpen.value = true
-			modalHeader.value = "Berhasil"
-			modalContent.value = "Berhasil mengubah kategori"
-		} else {
-			isOpen.value = true
-			modalHeader.value = "Gagal"
-			modalContent.value = result.body.message
-		}
+		editCategory(data).then((result) => {
+			if (result.statusCode == 200) {
+				isOpen.value = true
+				modalHeader.value = "Berhasil"
+				modalContent.value = result.body.message
+			} else {
+				isOpen.value = true
+				modalHeader.value = "Gagal"
+				modalContent.value = result.body.message
+			}
+		})
 	}
 	const deleteCategory = async (data) => {
 		const result = await setActiveCategory(data)
@@ -313,17 +295,17 @@
 			modalContent.value = result.body.message
 		}
 	}
-	const toggleUser = (user) => {
+	const toggleUser = (role_id) => {
 		const data = {
 			cu_cat_id: categoryId.value,
-			cu_role_id: user,
+			cu_role_id: role_id,
 		}
 		const isDataIncluded = selectedUser.value.some(
-			(item) => item.cu_cat_id === data.cu_cat_id && item.cu_us_username === data.cu_role_id
+			(item) => item.cu_cat_id === data.cu_cat_id && item.cu_role_id === data.cu_role_id
 		)
 		if (isDataIncluded) {
 			selectedUser.value = selectedUser.value.filter(
-				(item) => item.cu_cat_id !== data.cu_cat_id || item.cu_us_username !== data.cu_role_id
+				(item) => item.cu_cat_id !== data.cu_cat_id || item.cu_role_id !== data.cu_role_id
 			)
 		} else {
 			selectedUser.value.push(data)
