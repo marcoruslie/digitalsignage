@@ -79,59 +79,53 @@
 						d="M6 18L18 6M6 6l12 12" />
 				</svg>
 			</div>
-			<form
-				@submit.prevent="tambahListPengumuman"
-				class="flex-col flex-grow space-y-2 overflow-auto">
-				<div class="max-h-full">
+			<div
+				class="h-[100px] w-full rounded shadow-xl flex items-center justify-between space-x-3 px-2"
+				v-if="dataAnnouncementInList != null">
+				<div class="font-bold text-lg m-1">
+					{{ dataAnnouncementInList.announcement_in_list[currentIndex].announcement.an_title }}
+				</div>
+			</div>
+			<!-- Image Slider -->
+			<div class="relative flex items-center justify-center h-full">
+				<div class="overflow-hidden w-1/2 h-full">
 					<div
-						v-if="dataAnnouncementInList != null"
-						v-for="(data, index) in dataAnnouncementInList.announcement_in_list"
-						class="h-[100px] w-full rounded shadow-xl hover:bg-slate-50 flex items-center justify-between space-x-3">
-						<div class="flex justify-between items-center w-full space-x-3">
-							<div class="font-bold text-lg m-1 w-full">{{ data.announcement.an_title }}</div>
-							<div class="w-fit flex justify-end space-x-4">
-								<button
-									type="button"
-									v-if="data.announcement.an_url.includes('sim.stts')"
-									class="rounded bg-Primary text-OnPrimary text-center px-3 py-1"
-									@click="openModalQr(data.announcement.an_url)">
-									Detail
-								</button>
-								<button
-									type="button"
-									v-else-if="data.announcement.an_url.includes('drive.google')"
-									class="rounded bg-Primary text-OnPrimary text-center px-3 py-1"
-									@click="openModalKegiatan(data.announcement.an_url)">
-									Detail
-								</button>
-								<button
-									type="button"
-									v-else
-									class="rounded bg-Primary text-OnPrimary text-center px-3 py-1"
-									@click="openModalLowongan({ link: data.announcement.an_url })">
-									Detail
-								</button>
-								<div
-									@click="toggleSelection(data)"
-									class="relative w-14 h-8 rounded-full p-1 border-OnPrimaryContainer border-2 flex items-center bg-slate-200 cursor-pointer">
-									<input
-										type="checkbox"
-										v-on:click="toggleSelection(data)"
-										:checked="isSelected(data)"
-										class="absolute w-6 h-6 rounded-full appearance-none bg-white border-none checked:right-0 checked:left-6 transition-transform duration-1000 checked:bg-green-400"
-										disabled />
-								</div>
-							</div>
+						class="flex transition-transform duration-500 ease-in-out"
+						:style="{ transform: `translateX(-${currentIndex * 100}%)` }">
+						<!-- Loop through images -->
+						<div
+							v-if="dataAnnouncementInList != null"
+							v-for="(data, index) in dataAnnouncementInList.announcement_in_list"
+							:key="index"
+							class="flex-shrink-0 w-full h-full flex justify-center items-center">
+							<img
+								:src="data.announcement.an_url"
+								alt="Announcement Image"
+								class="max-w-full max-h-full object-contain rounded-lg shadow-xl" />
 						</div>
 					</div>
 				</div>
-			</form>
-			<button
-				class="rounded bg-Primary text-center cursor-pointer px-6 py-2 text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-300">
-				Tambahkan
-			</button>
+
+				<!-- Navigation Controls -->
+				<button
+					v-if="currentIndex > 0"
+					@click="prevSlide"
+					class="absolute top-1/2 transform -translate-y-1/2 left-0 bg-Primary text-OnPrimary p-2 rounded-full hover:bg-OnPrimaryContainer">
+					Prev
+				</button>
+				<button
+					v-if="
+						dataAnnouncementInList != null &&
+						currentIndex < dataAnnouncementInList.announcement_in_list.length - 1
+					"
+					@click="nextSlide"
+					class="absolute top-1/2 transform -translate-y-1/2 right-0 bg-Primary text-OnPrimary p-2 rounded-full hover:bg-OnPrimaryContainer">
+					Next
+				</button>
+			</div>
 		</div>
 	</div>
+
 	<!-- Modal add list pengumuman -->
 	<div
 		ref="modalAddListPengumuman"
@@ -271,10 +265,11 @@
 											Start : {{ data.keg_tanggal_start }} Deadline : {{ data.keg_tanggal_end }}
 										</div>
 									</div>
-									<div class="w-fit flex justify-end space-x-4">
+									<div
+										v-if="data.poster_preview_link != null"
+										class="w-fit flex justify-end space-x-4">
 										<button
 											type="button"
-											v-if="data.poster_preview_link != null"
 											class="rounded bg-Primary text-OnPrimary text-center px-3 py-1"
 											@click="openModalKegiatan(data)">
 											Detail
@@ -314,6 +309,8 @@
 </template>
 
 <script setup>
+	const currentIndex = ref(0)
+
 	const { getLaporanBAK, getPengumuman, getLowongan } = useDataISTTS()
 	const { getCategory } = useCategory()
 	const { getListAnnouncement, addListAnnouncement } = useAnnouncement()
@@ -353,6 +350,7 @@
 	watch(kategori, () => {
 		selectedItems.value = []
 	})
+	// Function to open or close modal
 	const toggleModalShowListPengumuman = (modal, data) => {
 		toggleModal(modal)
 		if (modal.classList.contains("hidden")) {
@@ -363,6 +361,7 @@
 	}
 	const toggleModal = (modal) => {
 		console.log(modal)
+		currentIndex.value = 0
 		modal.classList.toggle("hidden")
 	}
 	const openModalQr = (pdfUrl) => {
@@ -419,8 +418,8 @@
 				return {
 					an_id: item.pengumuman_kode,
 					an_title: item.pengumuman_judul,
-					an_url: item.pengumuman_namafile,
-					an_type: "PDF",
+					an_url: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${item.pengumuman_namafile}`,
+					an_type: "image",
 				}
 			})
 		} else if (kategori.value.name.toUpperCase() == "pengumuman kegiatan".toUpperCase()) {
@@ -429,7 +428,7 @@
 					an_id: item.keg_kode,
 					an_title: item.keg_nama,
 					an_url: item.poster_link,
-					an_type: "IMAGE",
+					an_type: "image",
 				}
 			})
 		} else {
@@ -438,13 +437,14 @@
 					an_id: item.lowongan_id,
 					an_title: `${item.perusahaan_nama} ${item.lowongan_judul}`,
 					an_url: item.link,
-					an_type: "IMAGE",
+					an_type: "image",
 				}
 			})
 		}
 		const data = {
 			listName: listName.value,
 			kategori: kategori.value.id,
+			kategoriName: kategori.value.name,
 			currentUser: currentUser.value.us_username,
 			announcements: dataItem,
 		}
@@ -458,4 +458,14 @@
 			})
 	}
 	const hapusListPengumuman = async () => {}
+	const nextSlide = () => {
+		if (currentIndex.value < dataAnnouncementInList.value.announcement_in_list.length - 1) {
+			currentIndex.value++
+		}
+	}
+	const prevSlide = () => {
+		if (currentIndex.value > 0) {
+			currentIndex.value--
+		}
+	}
 </script>

@@ -44,8 +44,12 @@
 						class="bg-Primary h-[30px] w-[260px] rounded flex flex-col items-center justify-center cursor-pointer hover:shadow-2xl hover:bg-OnPrimaryContainer text-OnPrimary"
 						@mouseover="isHoveredCurrentMusic[screen.sc_id] = true"
 						@mouseleave="isHoveredCurrentMusic[screen.sc_id] = false">
-						<div v-if="!isHoveredCurrentMusic[screen.sc_id]">Current Music : TES</div>
-						<marquee v-else>Current Music : TES</marquee>
+						<div
+							class="overflow-hidden flex items-start text-center max-h-[30px] w-max max-w-[260px]"
+							v-if="!isHoveredCurrentMusic[screen.sc_id]">
+							Current Music : {{ musicTitle(screen.sc_ip) }}
+						</div>
+						<marquee v-else>Current Music : {{ musicTitle(screen.sc_ip) }}</marquee>
 					</div>
 				</div>
 
@@ -113,8 +117,8 @@
 	<div
 		ref="modalChangeTemplate"
 		class="hidden overflow-x-hidden flex fixed top-0 right-0 left-0 z-10 justify-center items-center h-screen bg-black bg-opacity-50">
-		<div class="p-4 w-full max-w-2xl relative bg-white rounded-lg shadow sm:p-5">
-			<div class="flex gap-1 justify-between items-center pb-4 mb-4 rounded-t border-b">
+		<div class="p-4 w-full max-w-2xl relative bg-white rounded-lg shadow sm:p-5 flex flex-col space-y-2">
+			<div class="flex gap-1 justify-between items-center pb-4 rounded-t border-b">
 				<h3 class="text-lg font-semibold text-OnPrimaryContainer">Ganti Template</h3>
 				<svg
 					@click="toggleModalEdit(modalChangeTemplate)"
@@ -130,11 +134,26 @@
 						d="M6 18L18 6M6 6l12 12" />
 				</svg>
 			</div>
-			<form
-				@submit.prevent="changeTemplate"
-				class="flex flex-col space-y-2">
-				<div>
-					Template 1
+			<div class="flex flex-col space-y-2 max-h-[70vh] overflow-auto">
+				<div class="flex space-x-2">
+					<!-- TEMPLATE 1 -->
+					<div class="rounded w-full h-[300px] bg-Primary flex flex-col">
+						<div class="bg-black bg-opacity-40 h-full">
+							<marquee class="text-OnPrimary h-[10%] bg-Primary flex items-center">
+								Digital Signage ISTTS
+							</marquee>
+							<div class="h-[80%] flex justify-center items-center text-4xl text-white">CONTENT</div>
+							<marquee class="bg-OnPrimaryContainer h-[10%] flex">
+								<div class="flex items-center">
+									<div class="text-PrimaryContainer">Digital Signage ISTTS</div>
+									<img
+										src="/LogoISTTS.png"
+										alt=""
+										class="h-[30px]" />
+								</div>
+							</marquee>
+						</div>
+					</div>
 					<input
 						v-model="screenTemplate"
 						type="radio"
@@ -142,8 +161,41 @@
 						id="template"
 						value="template1" />
 				</div>
-				<div>
-					Template 2
+				<div class="flex space-x-2">
+					<!-- TEMPLATE 2 -->
+					<div class="rounded w-full h-[300px] bg-Primary flex flex-col">
+						<div class="bg-black bg-opacity-40 h-full">
+							<marquee class="text-OnPrimary h-[10%] bg-Primary flex items-center">
+								Digital Signage ISTTS
+							</marquee>
+							<div class="h-[80%] w-full flex justify-center items-center text-4xl text-white">
+								<div class="flex flex-col h-full w-1/3 overflow-hidden shadow-lg">
+									<!-- Weather UI -->
+									<div
+										class="h-1/2 bg-gradient-to-br from-OnPrimaryContainer to-Primary flex flex-col items-center justify-center text-base text-center">
+										Informasi Cuaca dan Jam
+									</div>
+									<!-- Reminder -->
+									<div class="h-1/2 bg-black flex flex-col justify-center items-center bg-opacity-60">
+										<div class="text-white p-1 text-base">Reminder</div>
+									</div>
+								</div>
+
+								<div class="flex h-full justify-center items-center w-2/3 bg-black bg-opacity-10">
+									Content
+								</div>
+							</div>
+							<marquee class="bg-OnPrimaryContainer h-[10%] flex">
+								<div class="flex items-center">
+									<div class="text-PrimaryContainer">Digital Signage ISTTS</div>
+									<img
+										src="/LogoISTTS.png"
+										alt=""
+										class="h-[30px]" />
+								</div>
+							</marquee>
+						</div>
+					</div>
 					<input
 						v-model="screenTemplate"
 						type="radio"
@@ -151,8 +203,29 @@
 						id="template"
 						value="template2" />
 				</div>
-				<div>
-					Template 3
+				<div class="flex space-x-2 justify-between">
+					<!-- TEMPLATE 3 -->
+					<div class="rounded w-[60%] h-[700px] bg-Primary flex flex-col">
+						<div class="bg-black bg-opacity-40 h-full">
+							<marquee class="text-OnPrimary h-[6%] bg-Primary flex items-center">
+								Digital Signage ISTTS
+							</marquee>
+							<div
+								class="h-[44%] bg-black bg-opacity-30 flex justify-center items-center text-4xl text-white">
+								CONTENT 1
+							</div>
+							<div class="h-[44%] flex justify-center items-center text-4xl text-white">CONTENT 2</div>
+							<marquee class="bg-OnPrimaryContainer h-[6%] flex">
+								<div class="flex items-center">
+									<div class="text-PrimaryContainer">Digital Signage ISTTS</div>
+									<img
+										src="/LogoISTTS.png"
+										alt=""
+										class="h-[30px]" />
+								</div>
+							</marquee>
+						</div>
+					</div>
 					<input
 						v-model="screenTemplate"
 						type="radio"
@@ -160,12 +233,13 @@
 						id="template"
 						value="template3" />
 				</div>
-				<button
-					type="submit"
-					class="w-full bg-Primary text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-300 rounded py-2">
-					Ganti Template
-				</button>
-			</form>
+			</div>
+
+			<button
+				@click="changeTemplate"
+				class="w-full bg-Primary text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-300 rounded py-2">
+				Ganti Template
+			</button>
 		</div>
 	</div>
 	<!-- MODAL TAMBAH SCREEN -->
@@ -488,7 +562,6 @@
 		<div class="p-4 w-1/2 max-w-6xl h-3/6/6 relative bg-white rounded-lg shadow sm:p-5 flex flex-col space-y-2">
 			<div class="flex justify-between items-center pb-4 rounded-t border-b">
 				<h3 class="text-lg font-semibold text-OnPrimaryContainer">Select Monitor</h3>
-				<h1>{{ selectedScreen }}</h1>
 				<svg
 					@click="toggleModal(modalMonitorBGM)"
 					xmlns="http://www.w3.org/2000/svg"
@@ -532,8 +605,12 @@
 						class="bg-Primary h-[30px] w-[260px] rounded flex flex-col items-center justify-center cursor-pointer hover:shadow-2xl hover:bg-OnPrimaryContainer text-OnPrimary"
 						@mouseover="isHoveredCurrentMusic[screen.sc_id] = true"
 						@mouseleave="isHoveredCurrentMusic[screen.sc_id] = false">
-						<marquee v-if="isHoveredCurrentMusic[screen.sc_id]"> Current Music : TES</marquee>
-						<div v-else-if="!isHoveredCurrentMusic[screen.sc_id]">Current Music : TES</div>
+						<div
+							class="overflow-hidden flex items-start text-center max-h-[30px] w-max max-w-[260px]"
+							v-if="!isHoveredCurrentMusic[screen.sc_id]">
+							Current Music : {{ musicTitle(screen.sc_ip) }}
+						</div>
+						<marquee v-else>Current Music : {{ musicTitle(screen.sc_ip) }}</marquee>
 					</div>
 				</div>
 			</div>
@@ -554,7 +631,7 @@
 <script setup>
 	import { io } from "socket.io-client"
 	const { getPlaylist } = usePlaylist()
-	const { sendMessage, refreshConnectedClient, getCLient } = useSocket()
+	const { getCLient, getMusicClient } = useSocket()
 	const { createScreen, deleteScreen, getScreen, updateScreen } = useScreen()
 	const listScreen = ref(await getScreen())
 	const isHoveredCurrentMusic = ref({})
@@ -648,6 +725,15 @@
 	const statusClass = (sc_ip) => {
 		return listClient.value.some((client) => client.socket_ip === sc_ip) ? "text-green-400" : "text-red-400"
 	}
+	const listMusic = ref(await getMusicClient())
+	console.log(listMusic.value)
+	const musicTitle = (sc_ip) => {
+		const music = listMusic.value.find((music) => music.socket_ip === sc_ip)
+		if (music) {
+			return music.title
+		}
+		return "-"
+	}
 	const host = "http://localhost:3000"
 	const socket = io(host, {
 		path: "/api/socket.io",
@@ -666,6 +752,12 @@
 
 		socket.on("connect", () => {
 			socket.emit("clientType", "server")
+		})
+		socket.on("refresh", () => {
+			router.go()
+		})
+		socket.on("success", (response) => {
+			openNotif("Success", response)
 		})
 		socket.on("userConnect", async (response) => {
 			listClient.value = await getCLient()
@@ -691,6 +783,9 @@
 			}
 			loadPlaylist.value = false
 		})
+		socket.on("resDataMusic", (response) => {
+			console.log(response)
+		})
 	})
 	const toggleSelectPlaylist = (pl_id, date) => {
 		const playlist = {
@@ -715,12 +810,13 @@
 		})
 	}
 	const changeBGM = () => {
-		selectedScreen.value.forEach((element) => {
-			socket.emit("changeBGM", {
+		for (const [key, value] of Object.entries(selectedScreen.value)) {
+			console.log(value.sc_ip, currentVideoId.value)
+			socket.emit("changeBgm", {
 				bgm: currentVideoId.value,
-				ip: element.sc_ip,
+				ip: value.sc_ip,
 			})
-		})
+		}
 	}
 	// FUNCTION MODAL
 	const toggleModal = (modal, screen) => {

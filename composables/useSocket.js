@@ -24,6 +24,16 @@ export default () => {
 			return error.message
 		}
 	}
+	const getMusicClient = async () => {
+		try {
+			const result = await $fetch("/api/getConnectedClientMusicId", {
+				cache: "no-store",
+			})
+			return result
+		} catch (error) {
+			return error.message
+		}
+	}
 	const refreshConnectedClient = async () => {
 		try {
 			const result = await $fetch("/api/refreshClient")
@@ -51,5 +61,6 @@ export default () => {
 		refreshConnectedClient,
 		getCLient,
 		sendData,
+		getMusicClient
 	}
 }

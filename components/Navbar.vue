@@ -21,12 +21,6 @@
 			Master List Pengumuman
 		</NuxtLink>
 		<NuxtLink
-			to="/Admin/MasterMusikPage"
-			class="flex w-full h-[45px] bg-gradient-to-br from-cyan-700 to-slate-900 rounded-sm items-center justify-center text-cyan-50 hover:duration-1000 hover:bg-gradient-to-br hover:to-cyan-400 hover:from-slate-500 hover:cursor-pointer mt-2"
-			active-class="bg-gradient-to-br from-cyan-200 to-slate-700">
-			Master BGM
-		</NuxtLink>
-		<NuxtLink
 			to="/Admin/MasterKategoriPage"
 			class="flex w-full h-[45px] bg-gradient-to-br from-cyan-700 to-slate-900 rounded-sm items-center justify-center text-cyan-50 hover:duration-1000 hover:bg-gradient-to-br hover:to-cyan-400 hover:from-slate-500 hover:cursor-pointer mt-2"
 			active-class="bg-gradient-to-br from-cyan-200 to-slate-700">

@@ -17,16 +17,68 @@ export default defineEventHandler(async (event) => {
 			})
 
 			// Create announcements
-			const announcementPromises = body.filteredAnnouncements.map((announcement) =>
-				prisma.announcement.create({
-					data: {
-						an_id: announcement.an_id,
-						an_title: announcement.an_title,
-						an_type: announcement.an_type,
-						an_url: announcement.an_url,
-					},
-				})
-			)
+			const announcementPromises = body.filteredAnnouncements.map(async (announcement) => {
+				let downloadFile, createAnnouncement
+
+				if (body.kategoriName === "Pengumuman Kampus" || body.kategoriName.includes("Lowongan")) {
+					// Download file from local
+
+					downloadFile = await $fetch("/api/localFile/downloadFile", {
+						method: "POST",
+						body: {
+							url: announcement.an_url,
+							kategori: body.kategoriName.replace(" ", ""),
+							id: announcement.an_id,
+						},
+					})
+
+					// Create announcement with the downloaded file path
+					createAnnouncement = prisma.announcement.create({
+						data: {
+							an_id: announcement.an_id,
+							an_cat_id: body.la_cat_id,
+							an_title: announcement.an_title,
+							an_type: announcement.an_type,
+							an_url: downloadFile.filePath,
+						},
+					})
+				} else if (body.kategoriName === "Pengumuman Kegiatan") {
+					// Download file from Google Drive
+					downloadFile = await $fetch("/api/downloadgd/gdfile", {
+						method: "POST",
+						body: {
+							file_id: announcement.an_url,
+						},
+					})
+
+					// Create announcement with the downloaded file path
+					createAnnouncement = prisma.announcement.create({
+						data: {
+							an_id: announcement.an_id,
+							an_cat_id: body.la_cat_id,
+							an_title: announcement.an_title,
+							an_type: announcement.an_type,
+							an_url: downloadFile.body.filePath,
+						},
+					})
+				} else {
+					// Create announcement without downloading file
+					createAnnouncement = prisma.announcement.create({
+						data: {
+							an_id: announcement.an_id,
+							an_cat_id: body.la_cat_id,
+							an_title: announcement.an_title,
+							an_type: announcement.an_type,
+							an_url: announcement.an_url,
+						},
+					})
+				}
+
+				// Return the promise
+				return createAnnouncement
+			})
+
+			// Wait for all announcements to be created
 			await Promise.all(announcementPromises)
 
 			// Create announcement_in_List
