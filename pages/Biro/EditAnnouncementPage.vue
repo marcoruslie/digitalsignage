@@ -4,7 +4,9 @@
 		<div class="flex flex-col h-full w-[20%] bg-white rounded-xl p-2 space-y-2">
 			<NavbarBiro />
 		</div>
-		<div class="h-full w-[80%] bg-white rounded-xl p-2 flex-col flex">
+		<div
+			v-if="currentUser != null"
+			class="h-full w-[80%] bg-white rounded-xl p-2 flex-col flex">
 			<div class="flex justify-between items-center">
 				<div class="text-Primary font-bold text-2xl">Edit/Tambah Pengumuman</div>
 				<div class="flex space-x-3">
@@ -16,55 +18,166 @@
 					<input
 						type="text"
 						v-model="imageUrl"
-						class="border-gray-400 border-2 rounded"
+						class="border-gray-400 border rounded"
 						placeholder="URL FILE"
 						@focusout="onFileChange" />
 					<input
 						type="file"
-						@change="onFileChange" />
-					<select v-model="uploadType">
-						<option value="">Pilih Cara Upload Konten</option>
-						<option value="langsung">Langsung Upload</option>
-						<option value="ekstraksi">Ekstraksi Teks</option>
-						<option value="edit">Edit Konten</option>
-					</select>
+						@change="handleFileUpload" />
 				</div>
 			</div>
 			<div class="border-b-2 border-Primary mt-1"></div>
-			<div v-if="uploadType == 'langsung'">
-				<input type="file" />
-			</div>
+			<!-- Langsung Upload -->
 			<div
-				v-else-if="uploadType == 'ekstraksi'"
+				:class="uploadType == 'langsung' ? 'flex-grow' : 'hidden'"
+				class="flex flex-col flex-grow w-full justify-center overflow-hidden">
+				<div class="flex flex-1 flex-col">
+					<input
+						type="file"
+						@change="handleFileUpload" />
+					<!-- Kategori -->
+					<select
+						class="rounded border px-4 py-2"
+						v-model="selectedCategory"
+						placeholder="Pilih Kategori">
+						<option
+							v-for="data in currentUser.role.categoryuser"
+							:disabled="
+								data.category.cat_name == 'Lowongan Magang' ||
+								data.category.cat_name == 'Pengumuman Kampus' ||
+								data.category.cat_name == 'Pengumuman Kegiatan' ||
+								data.category.cat_name == 'Lowongan Kerja'
+							"
+							:value="{ id: data.cu_cat_id, name: data.category.cat_name }">
+							{{ data.category.cat_name }}
+						</option>
+					</select>
+					<!-- Title -->
+					<input
+						type="text"
+						class="rounded border px-4 py-2"
+						placeholder="Judul Konten" />
+				</div>
+				<div class="flex justify-center h-full items-center transform overflow-hidden">
+					<!-- Image Preview -->
+					<img
+						v-if="isImage"
+						:src="previewUrl"
+						alt="Image Preview"
+						class="h-full" />
+					<!-- Video Preview -->
+					<video
+						v-if="isVideo"
+						controls
+						class="h-full">
+						<source
+							:src="previewUrl"
+							type="video/mp4" />
+						Your browser does not support the video tag.
+					</video>
+				</div>
+			</div>
+			<!-- Ekstraksi Teks -->
+			<div
+				:class="uploadType == 'ekstraksi' ? 'flex-grow' : 'hidden'"
 				class="flex-grow flex p-1 space-x-1 justify-end overflow-hidden">
 				<div class="w-[10%] min-w-[10%] max-h-full h-full flex-col flex items-center overflow-auto">
 					<div class="text-Primary font-bold text-lg">Property</div>
+					<div class="flex flex-col flex-grow border border-black rounded w-full pt-2 items-center space-y-2">
+						<button
+							@click="addText"
+							class="border border-Primary bg-PrimaryContainer p-1 rounded-lg h-[55px] w-[55px]">
+							<img
+								src="\AddText.png"
+								class="w-[40px] h-[40px]"
+								alt="" />
+						</button>
+						<button
+							@click="addRect"
+							class="border border-Primary bg-PrimaryContainer p-1 rounded-lg h-[55px] w-[55px]">
+							<img
+								src="\AddText.png"
+								class="w-[40px] h-[40px]"
+								alt="" />
+						</button>
+						<input
+							v-model="fontSize"
+							v-on:change="fontSizeOnChange"
+							type="number"
+							class="border border-Primary bg-PrimaryContainer rounded-lg text-center w-[55px] h-[55px] p-1 text-OnPrimaryContainer" />
+						<select
+							v-model="fontWeight"
+							v-on:change="fontWeightOnChange"
+							class="border border-Primary bg-PrimaryContainer rounded-lg text-center h-[55px] text-OnPrimaryContainer">
+							<option
+								value="normal"
+								class="text-OnPrimaryContainer">
+								Normal
+							</option>
+							<option
+								value="bold"
+								class="text-OnPrimaryContainer">
+								Bold
+							</option>
+						</select>
+						<div
+							class="flex flex-col items-center border border-Primary bg-PrimaryContainer text-OnPrimaryContainer rounded-lg h-[55px] p-1 w-[100px]">
+							<div class="text-OnPrimaryContainer">Background</div>
+							<input
+								type="color"
+								class="h-[25px] w-full" />
+						</div>
+						<div
+							class="flex flex-col items-center border border-Primary bg-PrimaryContainer text-OnPrimaryContainer rounded-lg h-[55px] p-1 w-[100px]">
+							<div class="text-OnPrimaryContainer">Font Color</div>
+							<input
+								type="color"
+								class="h-[45px] w-full" />
+						</div>
+						<div
+							class="flex flex-col items-center border border-Primary bg-PrimaryContainer text-OnPrimaryContainer rounded-lg h-[55px] p-1 w-[100px]">
+							<div class="text-OnPrimaryContainer">Font Color</div>
+							<input
+								type="color"
+								class="h-[45px] w-full" />
+						</div>
+						<input
+							placeholder="Width"
+							type="number"
+							class="border border-Primary bg-PrimaryContainer rounded-lg text-center w-[65px] h-[55px] p-1 text-OnPrimaryContainer text-sm" />
+						<input
+							placeholder="Height"
+							type="number"
+							class="border border-Primary bg-PrimaryContainer rounded-lg text-center w-[65px] h-[55px] p-1 text-OnPrimaryContainer text-sm" />
+					</div>
 				</div>
 				<div
+					ref="canvasDivRef"
 					class="w-[90%] max-h-full h-full flex-col flex items-center overflow-hidden"
 					:class="!minimize ? 'max-w-[45%]' : 'max-w-full'">
 					<div class="text-Primary font-bold text-lg">HASIL EKSTRAKSI KONTEN</div>
 					<canvas
-						class="text-base border-2 border-black rounded flex flex-grow w-full"
-						ref="canvasRef"></canvas>
+						ref="canvasRef"
+						class="border border-black rounded"></canvas>
 				</div>
 				<img
 					:src="minimize == false ? '/icon-minimize.png' : '/icon-maximize.png'"
 					class="cursor-pointer w-10 h-10"
 					@click="minimize = !minimize" />
+				<!-- Ekstraksi Konten -->
 				<div
 					class="w-[45%] max-h-full h-full flex-col flex items-center overflow-hidden"
 					:class="!minimize ? 'max-w-full' : 'max-w-0'">
 					<div class="text-Primary font-bold text-lg">KONTEN POSTER/GAMBAR</div>
 					<div
 						v-show="loading"
-						class="w-full h-6 bg-white text-center">
+						class="w-full h-6 bg-white text-center border border-black">
 						<div class="absolute text-center font-bold">{{ loadingProgress }}%</div>
 						<div
-							class="h-full bg-green-600 rounded-md"
+							class="h-full bg-green-400 rounded-md"
 							:style="{ width: loadingProgress + '%' }"></div>
 					</div>
-					<div class="flex flex-col h-full w-full relative border-2 border-black rounded">
+					<div class="flex flex-col h-full w-full relative border border-black rounded">
 						<div
 							class="relative w-full h-full overflow-hidden"
 							v-if="isImageLoaded"
@@ -91,9 +204,68 @@
 					</div>
 				</div>
 			</div>
-			<div v-else></div>
+			<!-- Edit Konten -->
+			<div
+				:class="uploadType == 'edit' ? 'flex-grow' : 'hidden'"
+				class="flex-grow"></div>
+
+			<div
+				:class="uploadType == '' ? 'flex-grow' : 'hidden'"
+				class="flex justify-center items-center flex-grow space-x-5">
+				<div
+					@click="uploadType = 'langsung'"
+					class="bg-Primary text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer w-44 h-44 rounded flex flex-col justify-center items-center hover:w-52 hover:h-52 duration-300">
+					<img
+						src="/icon-upload.png"
+						alt="" />
+					Langsung Upload
+				</div>
+				<div
+					@click="uploadType = 'ekstraksi'"
+					class="bg-Primary text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer w-44 h-44 rounded flex flex-col justify-center items-center hover:w-52 hover:h-52 duration-300">
+					<img
+						src="/icon-extract.png"
+						alt="" />
+					Ekstraksi Teks
+				</div>
+				<div
+					@click="uploadType = 'edit'"
+					class="bg-Primary text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer w-44 h-44 rounded flex flex-col justify-center items-center hover:w-52 hover:h-52 duration-300">
+					<img
+						class="w-[100px]"
+						src="/icon-edit-content.png"
+						alt="" />
+					Edit Konten
+				</div>
+			</div>
+			<div class="flex justify-between">
+				<div
+					v-if="uploadType != ''"
+					@click="prevBtnClick"
+					class="rounded text-white bg-red-500 w-fit px-8 py-2 cursor-pointer hover:bg-red-400 hover:text-red-500 duration-300">
+					PREV
+				</div>
+				<div>
+					<button
+						v-if="uploadType == 'langsung'"
+						class="rounded text-white bg-Primary w-fit px-4 py-2 cursor-pointer hover:bg-PrimaryContainer hover:text-Primary duration-300">
+						Upload
+					</button>
+					<button
+						v-else-if="uploadType == 'ekstraksi'"
+						class="rounded text-white bg-Primary w-fit px-4 py-2 cursor-pointer hover:bg-PrimaryContainer hover:text-Primary duration-300">
+						Ekstraksi
+					</button>
+					<button
+						v-else-if="uploadType == 'edit'"
+						class="rounded text-white bg-Primary w-fit px-4 py-2 cursor-pointer hover:bg-PrimaryContainer hover:text-Primary duration-300">
+						Simpan
+					</button>
+				</div>
+			</div>
 		</div>
 	</div>
+	<!-- MODAL SHOW LIST PENGUMUMAN -->
 	<div
 		ref="modalShowPengumuman"
 		class="hidden overflow-x-hidden flex fixed top-0 right-0 left-0 z-10 justify-center items-center h-screen bg-black bg-opacity-50">
@@ -181,8 +353,17 @@
 
 <script setup>
 	import Tesseract from "tesseract.js"
+
+	// CANVAS VAR
 	const canvasRef = ref(null)
 	const canvas = ref(null)
+	const canvasHeight = ref(0)
+	const fontSize = ref(0)
+	const fontWeight = ref("normal")
+	const canvasDivRef = ref(null)
+	const ObjectWidth = ref(0)
+	const ObjectHeigth = ref(0)
+	// MODAL VAR
 	const minimize = ref(false)
 	const uploadType = ref("")
 	const title = ref("")
@@ -202,9 +383,11 @@
 		currentUser.value = JSON.parse(sessionStorage.getItem("currentUser"))
 		if (process.client) {
 			const { fabric } = await import("fabric")
+			ObjectWidth.value = canvasDivRef.value.clientWidth
+			ObjectHeigth.value = canvasDivRef.value.clientHeight
 			canvas.value = new fabric.Canvas(canvasRef.value, {
-				width: window.innerWidth,
-				height: window.innerHeight - 100,
+				width: ObjectWidth.value,
+				height: ObjectHeigth.value,
 				backgroundColor: "white",
 			})
 			canvas.value.on("mouse:dblclick", (event) => {
@@ -229,19 +412,6 @@
 	})
 	const toggleModal = (modal) => {
 		modal.classList.toggle("hidden")
-	}
-	const handleFileInputChange = (event) => {
-		const file = event.target.files[0]
-		if (file) {
-			readFile(file)
-		}
-	}
-	const readFile = (file) => {
-		const reader = new FileReader()
-		reader.onload = () => {
-			imageUrl.value = reader.result
-		}
-		reader.readAsDataURL(file)
 	}
 	const openModalKonten = (data) => {
 		isModalPengumumanOpen.value = !isModalPengumumanOpen.value
@@ -274,7 +444,7 @@
 	const onImageLoad = () => {
 		isImageLoaded.value = true
 	}
-
+	// OCR FUNCTION
 	const performOCR = async () => {
 		loading.value = true
 		const {
@@ -324,5 +494,99 @@
 				reject(new Error("Failed to load image"))
 			}
 		})
+	}
+
+	const previewUrl = ref(null)
+	const isImage = ref(false)
+	const isVideo = ref(false)
+	function handleFileUpload(event) {
+		const file = event.target.files[0]
+		if (file) {
+			const fileType = file.type
+			if (fileType.startsWith("image/")) {
+				isImage.value = true
+				isVideo.value = false
+				previewUrl.value = URL.createObjectURL(file) // Create a preview URL for the image
+			} else if (fileType.startsWith("video/")) {
+				isImage.value = false
+				isVideo.value = true
+				previewUrl.value = URL.createObjectURL(file) // Create a preview URL for the video
+			} else {
+				resetPreview()
+				alert("Please select an image or video file.")
+			}
+		}
+	}
+	function prevBtnClick() {
+		uploadType.value = ""
+		resetPreview()
+	}
+	function resetPreview() {
+		previewUrl.value = null
+		isImage.value = false
+		isVideo.value = false
+	}
+	// CANVAS FUNCTION
+	function fontSizeOnChange() {
+		const activeObject = canvas.value.getActiveObject()
+		if (activeObject && activeObject.type === "textbox") {
+			activeObject.fontSize = fontSize.value
+			canvas.value.renderAll()
+		}
+	}
+
+	function fontWeightOnChange() {
+		const activeObject = canvas.value.getActiveObject()
+		if (activeObject && activeObject.type === "textbox") {
+			activeObject.fontWeight = fontWeight.value
+			canvas.value.renderAll()
+		}
+	}
+	async function addText() {
+		const { fabric } = await import("fabric")
+		const text = new fabric.Textbox("Your text here", {
+			width: 80,
+			fontSize: 20,
+			fill: "black",
+			hasControls: false,
+		})
+		canvas.value.add(text)
+		console.log(canvas.value)
+	}
+	async function addRect() {
+		const { fabric } = await import("fabric")
+		const rect = new fabric.Rect({
+			width: 80,
+			height: 80,
+			fill: "black",
+		})
+
+		canvas.value.add(rect)
+	}
+	const handleDragOver = (event) => {
+		event.preventDefault()
+		alert("drag")
+	}
+	const handleDrop = (event) => {
+		event.preventDefault()
+		alert("drag")
+		const file = event.dataTransfer.files[0]
+		if (file.type && file.type.indexOf("image") === 0) {
+			const reader = new FileReader()
+			reader.onload = function (event) {
+				const img = new Image()
+				img.onload = function () {
+					const fabricImg = new fabric.Image(img, {
+						left: event.clientX - canvasRef.value.getBoundingClientRect().left,
+						top: event.clientY - canvasRef.value.getBoundingClientRect().top,
+					})
+					canvas.add(fabricImg)
+				}
+				img.src = event.target.result
+			}
+			reader.readAsDataURL(file)
+		} else {
+			alert("Please drop an image file.")
+		}
 	}
 </script>

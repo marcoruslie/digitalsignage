@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
 	const fileUrl = body.url
 	const compressType = body.type || "image"
 	const kategori = body.kategori
-	const idContent = body.id || 'null'
+	const idContent = body.id || "null"
 	if (!fileUrl) {
 		throw createError({
 			statusCode: 400,
@@ -16,11 +16,10 @@ export default defineEventHandler(async (event) => {
 	}
 
 	try {
-		let id:string = ''
-		if(idContent == 'null'){
+		let id: string = ""
+		if (idContent == "null") {
 			id = extractIdFromUrl(fileUrl)
-		}
-		else{
+		} else {
 			id = idContent
 		}
 		const response = await fetch(fileUrl)
@@ -39,8 +38,12 @@ export default defineEventHandler(async (event) => {
 
 		if (compressType === "image") {
 			await sharp(buffer)
-				.resize(800, 600, { fit: "inside" })
-				.toFormat(sharpFormat, { quality: 80 })
+				.resize(1200, 800, { fit: "inside" }) // Resize carefully, if needed
+				.toFormat(sharpFormat, {
+					quality: 100, // Maximum quality
+					progressive: true, // Enable progressive rendering for JPEG
+					chromaSubsampling: "4:4:4", // Prevent color subsampling (for JPEG)
+				})
 				.toFile(filePath)
 		}
 		const editedFile = join("/_nuxt/resources", kategori, compressedFileName)
@@ -52,7 +55,7 @@ export default defineEventHandler(async (event) => {
 		})
 	}
 })
-function extractIdFromUrl(url: string):string {
+function extractIdFromUrl(url: string): string {
 	const parsedUrl = new URL(url)
 	const id = parsedUrl.searchParams.get("id")
 	if (!id) {
@@ -61,12 +64,12 @@ function extractIdFromUrl(url: string):string {
 			return name!.split(".")[0]
 		}
 	}
-	return id || 'null'
+	return id || "null"
 }
 function getFileExtension(url: string) {
 	const parts = url.split(".")
 	const ext = parts.pop()?.split(/[?#]/)[0]
-	if(ext == "pdf") return "png"
+	if (ext == "pdf") return "png"
 	return ext && ext.length <= 4 ? ext : ""
 }
 function mapExtensionToSharpFormat(ext: string): keyof sharp.FormatEnum {
