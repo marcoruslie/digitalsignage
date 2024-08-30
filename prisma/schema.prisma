@@ -99,7 +99,7 @@ model Announcement_in_List{
   ail_an_id String
   ail_la_id String
   announcement Announcement @relation(fields: [ail_an_id], references: [an_id])
-  listannouncement List_Announcement @relation(fields: [ail_la_id], references: [la_id])
+  listannouncement List_Announcement @relation(fields: [ail_la_id], references: [la_id], onDelete: Cascade)
   createdAt DateTime @default(now())
   deletedAt DateTime?
 }

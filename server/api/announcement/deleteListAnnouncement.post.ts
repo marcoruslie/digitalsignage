@@ -1,13 +1,18 @@
-import {prisma} from '../../db/index'
+import { ca } from "date-fns/locale"
+import { prisma } from "../../db/index"
 export default defineEventHandler(async (event) => {
-    const body = await readBody(event)
-    
-    const deleteListAnnouncement = prisma.announcement.deleteMany({
-        where: {
-            an_id: {
-                in: body.an_id
-            }
-        }
-    })
-    return deleteListAnnouncement
+	const body = await readBody(event)
+	try {
+		const deleteListAnnouncement = await prisma.list_Announcement.delete({
+			where: {
+				la_id: body.la_id,
+			},
+		})
+		return {
+			status: 200,
+			statusText: "Berhasil Delete List Pengumuman",
+		}
+	} catch (error:any) {
+		return { status: 400, statusText: error.message }
+	}
 })

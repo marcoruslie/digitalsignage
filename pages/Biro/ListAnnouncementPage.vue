@@ -37,7 +37,10 @@
 			<div class="flex-grow flex-col p-1 space-y-1">
 				<!-- List - List Pengumuman -->
 				<div
-					v-for="(data, index) in dataListAnnouncement"
+					v-if="currentUser != null"
+					v-for="(data, index) in dataListAnnouncement.filter(
+						(item) => item.la_us_username == currentUser.us_username
+					)"
 					class="h-[100px] w-full rounded shadow-xl flex items-center justify-between space-x-3 px-2">
 					<div class="flex items-center space-x-3 justify-between w-full">
 						<!-- <div class="w-[100px] h-[100px] bg-PrimaryContainer rounded-l">
@@ -46,10 +49,14 @@
 						<div class="w-full">
 							<div class="font-bold text-lg m-1">{{ data.la_title }}</div>
 						</div>
-						<div class="w-full flex justify-end">
+						<div class="w-full flex space-x-2 justify-end">
 							<img
 								src="/icon_detail.png"
 								@click="toggleModalShowListPengumuman(modalShowListPengumuman, data)"
+								class="w-[50px] h-[50px] hover:bg-slate-200 rounded hover:duration-300" />
+							<img
+								@click="hapusListPengumuman(data)"
+								src="/icon-delete.png"
 								class="w-[50px] h-[50px] hover:bg-slate-200 rounded hover:duration-300" />
 						</div>
 					</div>
@@ -62,7 +69,7 @@
 		ref="modalShowListPengumuman"
 		class="hidden overflow-x-hidden flex fixed top-0 right-0 left-0 z-10 justify-center items-center h-screen bg-black bg-opacity-50">
 		<div
-			class="p-4 w-3/4 max-w-6xl h-[calc(100vh-20px)] relative bg-white rounded-lg shadow sm:p-5 flex flex-col space-y-2">
+			class="p-4 w-3/4 max-w-6xl h-[calc(100vh-20px)] relative bg-white rounded-lg shadow sm:p-5 flex flex-col space-y-2 overflow-hidden">
 			<div class="flex justify-between items-center pb-4 rounded-t border-b">
 				<h3 class="text-lg font-semibold text-OnPrimaryContainer">List Pengumuman</h3>
 				<svg
@@ -87,8 +94,8 @@
 				</div>
 			</div>
 			<!-- Image Slider -->
-			<div class="relative flex items-center justify-center h-full">
-				<div class="overflow-hidden w-1/2 h-full">
+			<div class="relative flex items-center justify-center flex-grow overflow-auto">
+				<div class="overflow-auto w-2/3 h-full">
 					<div
 						class="flex transition-transform duration-500 ease-in-out"
 						:style="{ transform: `translateX(-${currentIndex * 100}%)` }">
@@ -97,11 +104,17 @@
 							v-if="dataAnnouncementInList != null"
 							v-for="(data, index) in dataAnnouncementInList.announcement_in_list"
 							:key="index"
-							class="flex-shrink-0 w-full h-full flex justify-center items-center">
+							class="flex-shrink-0 w-full h-1/2 flex justify-center items-center">
 							<img
+								v-if="data.announcement.an_type == 'image'"
 								:src="data.announcement.an_url"
 								alt="Announcement Image"
 								class="max-w-full max-h-full object-contain rounded-lg shadow-xl" />
+							<video
+								v-else
+								class="max-w-full max-h-full object-contain rounded-lg shadow-xl"
+								controls
+								:src="data.announcement.an_url"></video>
 						</div>
 					</div>
 				</div>
@@ -206,7 +219,7 @@
 					</div>
 					<!-- Kategori lowongan magang/kerja -->
 					<div
-						v-if="kategori.name.toUpperCase().includes('LOWONGAN')"
+						v-else-if="kategori.name.toUpperCase().includes('LOWONGAN')"
 						v-for="(data, index) in filteredLowongan"
 						class="h-[100px] w-full rounded shadow-xl hover:bg-slate-50 flex items-center justify-between space-x-3">
 						<div class="flex items-center space-x-3 w-full">
@@ -246,7 +259,7 @@
 					</div>
 					<!-- Kategori kegiatan kampus -->
 					<div
-						v-if="kategori.name.toUpperCase() == 'pengumuman kegiatan'.toUpperCase()"
+						v-else-if="kategori.name.toUpperCase() == 'pengumuman kegiatan'.toUpperCase()"
 						v-for="(data, index) in dataLaporanBAK"
 						class="h-[100px] w-full rounded shadow-xl hover:bg-slate-50 flex items-center justify-between space-x-3">
 						<div
@@ -288,6 +301,40 @@
 							</div>
 						</div>
 					</div>
+					<!-- Kategori lain -->
+					<div
+						v-else
+						v-for="(data, index) in dataAnnouncement.filter((item) => item.an_cat_id == kategori.id)"
+						class="h-[100px] w-full rounded shadow-xl hover:bg-slate-50 flex items-center justify-between space-x-3">
+						<div class="flex items-center space-x-3 w-full">
+							<div class="flex-col w-full">
+								<div class="font-bold text-lg m-1">{{ data.an_title }}</div>
+								<div class="flex justify-between w-full items-center">
+									<div class="w-full">
+										<div>Tanggal Dibuat : {{ convertDate(data.createdAt) }}</div>
+										<div>Jenis Konten : {{ data.an_type }}</div>
+									</div>
+									<div class="w-fit flex justify-end space-x-4">
+										<button
+											type="button"
+											class="rounded bg-Primary text-OnPrimary text-center px-3 py-1"
+											@click="openModalKonten(data)">
+											Detail
+										</button>
+										<div
+											@click="toggleSelection(data)"
+											class="relative w-14 h-8 rounded-full p-1 border-OnPrimaryContainer border-2 flex items-center bg-slate-200 cursor-pointer">
+											<input
+												type="checkbox"
+												:checked="isSelected(data)"
+												disabled
+												class="absolute w-6 h-6 rounded-full appearance-none bg-white border-none checked:right-0 checked:left-6 transition-transform duration-1000 checked:bg-green-400" />
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 			<button
@@ -300,6 +347,7 @@
 	<ModalShowPengumuman
 		:modalPengumuman="isModalPengumumanOpen"
 		:imageUrl="imageUrl"
+		:kontenType="kontenType"
 		:closeModal="closeModal" />
 	<NotificationModal
 		:modalHeader="modalHeader"
@@ -313,7 +361,7 @@
 
 	const { getLaporanBAK, getPengumuman, getLowongan } = useDataISTTS()
 	const { getCategory } = useCategory()
-	const { getListAnnouncement, addListAnnouncement } = useAnnouncement()
+	const { getListAnnouncement, addListAnnouncement, deleteListAnnouncement, getAnnouncement } = useAnnouncement()
 	const modalHeader = ref("")
 	const modalContent = ref("")
 	const isOpen = ref(false)
@@ -336,12 +384,15 @@
 	const dataPengumuman = pengumumanRes.response
 	const dataLowongan = lowonganRes.response
 	const dataLaporanBAK = laporanBAKRes.response
+	const dataAnnouncement = ref(await getAnnouncement())
 	const dataListAnnouncement = ref(await getListAnnouncement())
 	const dataAnnouncementInList = ref(null)
 	const listName = ref("")
 	const kategori = ref(null)
 	const currentUser = ref(null)
+	// Variabel untuk menampung data pengumuman yang dipilih
 	const imageUrl = ref(null)
+	const kontenType = ref(null)
 	const selectedItems = ref([])
 
 	onMounted(async () => {
@@ -364,19 +415,29 @@
 		currentIndex.value = 0
 		modal.classList.toggle("hidden")
 	}
+	// MODAL TO SHOW PENGUMUMAN
 	const openModalQr = (pdfUrl) => {
 		isModalPengumumanOpen.value = !isModalPengumumanOpen.value
+		kontenType.value = "image"
 		convertPDFtoQrCode(pdfUrl)
 	}
 	const openModalLowongan = (data) => {
 		isModalPengumumanOpen.value = !isModalPengumumanOpen.value
+		kontenType.value = "image"
 		imageUrl.value = data.link
 	}
 	const openModalKegiatan = (data) => {
 		isModalPengumumanOpen.value = !isModalPengumumanOpen.value
-		const link = `https://drive.google.com/thumbnail?id=${data.poster_link}`
+		kontenType.value = "image"
+		const link = `https://drive.google.com/thumbnail?id=${data.poster_link}&sz=h100`
 		imageUrl.value = link
 	}
+	const openModalKonten = (data) => {
+		isModalPengumumanOpen.value = !isModalPengumumanOpen.value
+		imageUrl.value = data.an_url
+		kontenType.value = data.an_type
+	}
+
 	const closeModal = () => {
 		isModalPengumumanOpen.value = !isModalPengumumanOpen.value
 	}
@@ -431,13 +492,22 @@
 					an_type: "image",
 				}
 			})
-		} else {
+		} else if (kategori.value.name.toUpperCase().includes("LOWONGAN")) {
 			dataItem = selectedItems.value.map((item) => {
 				return {
 					an_id: item.lowongan_id,
 					an_title: `${item.perusahaan_nama} ${item.lowongan_judul}`,
 					an_url: item.link,
 					an_type: "image",
+				}
+			})
+		} else {
+			dataItem = selectedItems.value.map((item) => {
+				return {
+					an_id: item.an_id,
+					an_title: item.an_title,
+					an_url: item.an_url,
+					an_type: item.an_type,
 				}
 			})
 		}
@@ -457,7 +527,16 @@
 				openNotif("Error", err.response.data.message)
 			})
 	}
-	const hapusListPengumuman = async () => {}
+	const hapusListPengumuman = async (data) => {
+		const result = await deleteListAnnouncement(data)
+		console.log(result)
+		if (result.status == 200) {
+			openNotif("Berhasil", result.statusText)
+		} else {
+			openNotif("Error", result.statusText)
+		}
+	}
+	// Pagination untuk image slider
 	const nextSlide = () => {
 		if (currentIndex.value < dataAnnouncementInList.value.announcement_in_list.length - 1) {
 			currentIndex.value++
@@ -467,5 +546,10 @@
 		if (currentIndex.value > 0) {
 			currentIndex.value--
 		}
+	}
+	// Convert createdAt to readable date DD Month Year in Indonesian
+	const convertDate = (date) => {
+		const options = { year: "numeric", month: "long", day: "numeric" }
+		return new Date(date).toLocaleDateString("id-ID", options)
 	}
 </script>

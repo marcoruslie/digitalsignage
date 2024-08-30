@@ -9,7 +9,7 @@ export default () => {
 		const filteredAnnouncement = selectedAnnouncement.filter((item) => {
 			return !announcement.some((ann) => ann.an_id === item.an_id)
 		})
-		try{
+		try {
 			const result = await $fetch("/api/announcement/createListAnnouncement", {
 				method: "POST",
 				body: {
@@ -22,11 +22,9 @@ export default () => {
 					announcements: selectedAnnouncement,
 				},
 			})
-			
-			
+
 			return result
-		}
-		catch(e){
+		} catch (e) {
 			return e
 		}
 	}
@@ -34,8 +32,24 @@ export default () => {
 		const result = await $fetch("/api/announcement/getAnnouncement")
 		return result
 	}
-
+	const addAnnouncement = async (data) => {
+		const formData = new FormData()
+		// title: judulKonten.value,
+		// 	category: kategoriKonten.value,
+		// 	previewUrl: previewUrl.value,
+		// 	kontenType: isImage.value ? "image" : "video",
+		formData.append("title", data.title)
+		formData.append("file", data.file)
+		formData.append("category", JSON.stringify(data.category))
+		formData.append("kontenType", data.kontenType)
+		const result = await $fetch("/api/announcement/createAnnouncement", {
+			method: "POST",
+			body: formData,
+		})
+		return result
+	}
 	const deleteListAnnouncement = async (data) => {
+		console.log(data)
 		const result = await $fetch("/api/announcement/deleteListAnnouncement", {
 			method: "POST",
 			body: {
@@ -49,6 +63,7 @@ export default () => {
 		getListAnnouncement,
 		addListAnnouncement,
 		getAnnouncement,
-		deleteListAnnouncement
+		deleteListAnnouncement,
+		addAnnouncement,
 	}
 }

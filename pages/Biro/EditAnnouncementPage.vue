@@ -9,7 +9,9 @@
 			class="h-full w-[80%] bg-white rounded-xl p-2 flex-col flex">
 			<div class="flex justify-between items-center">
 				<div class="text-Primary font-bold text-2xl">Edit/Tambah Pengumuman</div>
-				<div class="flex space-x-3">
+				<div
+					class="flex space-x-3"
+					v-if="uploadType == 'ekstraksi'">
 					<button
 						@click="toggleModal(modalShowPengumuman)"
 						class="bg-Primary rounded text-OnPrimary px-4 py-1 hover:text-OnPrimaryContainer hover:bg-PrimaryContainer hover:duration-300">
@@ -23,7 +25,7 @@
 						@focusout="onFileChange" />
 					<input
 						type="file"
-						@change="handleFileUpload" />
+						@change="onFileChange" />
 				</div>
 			</div>
 			<div class="border-b-2 border-Primary mt-1"></div>
@@ -31,14 +33,14 @@
 			<div
 				:class="uploadType == 'langsung' ? 'flex-grow' : 'hidden'"
 				class="flex flex-col flex-grow w-full justify-center overflow-hidden">
-				<div class="flex flex-1 flex-col">
+				<div class="flex flex-1 flex-col space-y-2">
 					<input
 						type="file"
 						@change="handleFileUpload" />
 					<!-- Kategori -->
 					<select
 						class="rounded border px-4 py-2"
-						v-model="selectedCategory"
+						v-model="kategoriKonten"
 						placeholder="Pilih Kategori">
 						<option
 							v-for="data in currentUser.role.categoryuser"
@@ -54,6 +56,7 @@
 					</select>
 					<!-- Title -->
 					<input
+						v-model="judulKonten"
 						type="text"
 						class="rounded border px-4 py-2"
 						placeholder="Judul Konten" />
@@ -83,10 +86,15 @@
 				class="flex-grow flex p-1 space-x-1 justify-end overflow-hidden">
 				<div class="w-[10%] min-w-[10%] max-h-full h-full flex-col flex items-center overflow-auto">
 					<div class="text-Primary font-bold text-lg">Property</div>
-					<div class="flex flex-col flex-grow border border-black rounded w-full pt-2 items-center space-y-2">
+					<div
+						class="flex flex-col flex-grow border border-black rounded w-full pt-2 items-center space-y-1 overflow-auto">
+						<div
+							class="hover:bg-PrimaryContainer hover:text-OnPrimaryContainer border-Primary border w-full p-1 cursor-pointer bg-Primary text-OnPrimary duration-300">
+							OBJECT
+						</div>
 						<button
 							@click="addText"
-							class="border border-Primary bg-PrimaryContainer p-1 rounded-lg h-[55px] w-[55px]">
+							class="bg-PrimaryContainer border border-Primary text-OnPrimaryContainer hover:bg-Primary hover:text-OnPrimary text-center w-[100px] h-[55px] p-1 rounded shadow transition cursor-pointer flex justify-center items-center">
 							<img
 								src="\AddText.png"
 								class="w-[40px] h-[40px]"
@@ -94,21 +102,45 @@
 						</button>
 						<button
 							@click="addRect"
-							class="border border-Primary bg-PrimaryContainer p-1 rounded-lg h-[55px] w-[55px]">
-							<img
-								src="\AddText.png"
-								class="w-[40px] h-[40px]"
-								alt="" />
+							class="bg-PrimaryContainer border border-Primary text-OnPrimaryContainer hover:bg-Primary hover:text-OnPrimary text-center w-[100px] h-[55px] p-1 rounded shadow transition cursor-pointer flex justify-center items-center">
+							<div class="w-[40px] h-[40px] bg-white border border-black"></div>
 						</button>
+						<label
+							for="image-upload"
+							class="w-[100px] h-[55px] flex-col flex justify-center items-center cursor-pointer bg-PrimaryContainer border border-Primary text-OnPrimaryContainer hover:bg-Primary hover:text-OnPrimary py-2 px-4 rounded shadow transition">
+							<svg
+								class="w-10 h-10 mr-2"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								xmlns="http://www.w3.org/2000/svg">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M4 7v13a1 1 0 001 1h14a1 1 0 001-1V7m-9 4l3 3 4-4m-7-4H5a1 1 0 00-1 1v2m15-2h-5M6 5h.01"></path>
+							</svg>
+							<span>Image</span>
+							<input
+								id="image-upload"
+								type="file"
+								class="hidden"
+								@change="addImageToCanvas" />
+						</label>
+
+						<div
+							class="hover:bg-PrimaryContainer hover:text-OnPrimaryContainer border-Primary border w-full p-1 cursor-pointer bg-Primary text-OnPrimary duration-300">
+							FONT
+						</div>
 						<input
 							v-model="fontSize"
 							v-on:change="fontSizeOnChange"
 							type="number"
-							class="border border-Primary bg-PrimaryContainer rounded-lg text-center w-[55px] h-[55px] p-1 text-OnPrimaryContainer" />
+							class="bg-PrimaryContainer border border-Primary text-OnPrimaryContainer hover:bg-Primary hover:text-OnPrimary text-center w-[100px] h-[55px] p-1 rounded shadow transition cursor-pointer" />
 						<select
 							v-model="fontWeight"
 							v-on:change="fontWeightOnChange"
-							class="border border-Primary bg-PrimaryContainer rounded-lg text-center h-[55px] text-OnPrimaryContainer">
+							class="bg-PrimaryContainer border border-Primary text-OnPrimaryContainer hover:bg-Primary hover:text-OnPrimary text-center w-[100px] h-[55px] p-1 rounded shadow transition cursor-pointer">
 							<option
 								value="normal"
 								class="text-OnPrimaryContainer">
@@ -121,39 +153,41 @@
 							</option>
 						</select>
 						<div
-							class="flex flex-col items-center border border-Primary bg-PrimaryContainer text-OnPrimaryContainer rounded-lg h-[55px] p-1 w-[100px]">
-							<div class="text-OnPrimaryContainer">Background</div>
+							class="bg-PrimaryContainer border border-Primary text-OnPrimaryContainer hover:bg-Primary hover:text-OnPrimary text-center w-[100px] h-[55px] p-1 rounded shadow transition cursor-pointer">
+							<div>Background</div>
 							<input
 								type="color"
 								class="h-[25px] w-full" />
 						</div>
 						<div
-							class="flex flex-col items-center border border-Primary bg-PrimaryContainer text-OnPrimaryContainer rounded-lg h-[55px] p-1 w-[100px]">
-							<div class="text-OnPrimaryContainer">Font Color</div>
+							class="w-[100px] h-[55px] flex-col flex items-center cursor-pointer bg-PrimaryContainer border border-Primary text-OnPrimaryContainer hover:bg-Primary hover:text-OnPrimary p-1 rounded shadow transition">
+							<div>Font Color</div>
 							<input
 								type="color"
 								class="h-[45px] w-full" />
 						</div>
+
 						<div
-							class="flex flex-col items-center border border-Primary bg-PrimaryContainer text-OnPrimaryContainer rounded-lg h-[55px] p-1 w-[100px]">
-							<div class="text-OnPrimaryContainer">Font Color</div>
-							<input
-								type="color"
-								class="h-[45px] w-full" />
+							class="hover:bg-PrimaryContainer hover:text-OnPrimaryContainer border-Primary border w-full p-1 cursor-pointer bg-Primary text-OnPrimary duration-300">
+							CANVAS SIZE
 						</div>
 						<input
+							v-model="canvasWidth"
+							@input="resizeCanvas"
 							placeholder="Width"
 							type="number"
-							class="border border-Primary bg-PrimaryContainer rounded-lg text-center w-[65px] h-[55px] p-1 text-OnPrimaryContainer text-sm" />
+							class="w-[100px] h-[55px] flex-col flex justify-center items-center cursor-pointer bg-PrimaryContainer border border-Primary text-OnPrimaryContainer hover:bg-Primary hover:text-OnPrimary py-2 px-4 rounded shadow transition" />
 						<input
+							v-model="canvasHeight"
+							@input="resizeCanvas"
 							placeholder="Height"
 							type="number"
-							class="border border-Primary bg-PrimaryContainer rounded-lg text-center w-[65px] h-[55px] p-1 text-OnPrimaryContainer text-sm" />
+							class="w-[100px] h-[55px] flex-col flex justify-center items-center cursor-pointer bg-PrimaryContainer border border-Primary text-OnPrimaryContainer hover:bg-Primary hover:text-OnPrimary py-2 px-4 rounded shadow transition" />
 					</div>
 				</div>
 				<div
 					ref="canvasDivRef"
-					class="w-[90%] max-h-full h-full flex-col flex items-center overflow-hidden"
+					class="w-[90%] max-h-full h-full flex-col flex items-center overflow-auto"
 					:class="!minimize ? 'max-w-[45%]' : 'max-w-full'">
 					<div class="text-Primary font-bold text-lg">HASIL EKSTRAKSI KONTEN</div>
 					<canvas
@@ -163,7 +197,7 @@
 				<img
 					:src="minimize == false ? '/icon-minimize.png' : '/icon-maximize.png'"
 					class="cursor-pointer w-10 h-10"
-					@click="minimize = !minimize" />
+					@click="minimizeFunction" />
 				<!-- Ekstraksi Konten -->
 				<div
 					class="w-[45%] max-h-full h-full flex-col flex items-center overflow-hidden"
@@ -186,20 +220,6 @@
 								:src="imageUrl"
 								alt=""
 								class="absolute top-0 left-0 h-full w-full" />
-							<div
-								v-for="(word, index) in detectedWords"
-								:key="index"
-								class="absolute text-center bg-transparent rounded"
-								:style="{
-									left: word.bbox.left + '%',
-									top: word.bbox.top + '%',
-									width: word.bbox.width + '%',
-									height: word.bbox.height + '%',
-									backgroundColor: word.selected ? 'blue' : 'gray',
-									fontSize: word.fontSize <= 10 ? '10px' : word.fontSize + 'px',
-								}">
-								{{ word.text }}
-							</div>
 						</div>
 					</div>
 				</div>
@@ -208,12 +228,12 @@
 			<div
 				:class="uploadType == 'edit' ? 'flex-grow' : 'hidden'"
 				class="flex-grow"></div>
-
+			<!-- Button untuk pindah section -->
 			<div
 				:class="uploadType == '' ? 'flex-grow' : 'hidden'"
 				class="flex justify-center items-center flex-grow space-x-5">
 				<div
-					@click="uploadType = 'langsung'"
+					@click="changeSection('langsung')"
 					class="bg-Primary text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer w-44 h-44 rounded flex flex-col justify-center items-center hover:w-52 hover:h-52 duration-300">
 					<img
 						src="/icon-upload.png"
@@ -221,7 +241,7 @@
 					Langsung Upload
 				</div>
 				<div
-					@click="uploadType = 'ekstraksi'"
+					@click="changeSection('ekstraksi')"
 					class="bg-Primary text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer w-44 h-44 rounded flex flex-col justify-center items-center hover:w-52 hover:h-52 duration-300">
 					<img
 						src="/icon-extract.png"
@@ -229,7 +249,7 @@
 					Ekstraksi Teks
 				</div>
 				<div
-					@click="uploadType = 'edit'"
+					@click="changeSection('edit')"
 					class="bg-Primary text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer w-44 h-44 rounded flex flex-col justify-center items-center hover:w-52 hover:h-52 duration-300">
 					<img
 						class="w-[100px]"
@@ -248,6 +268,7 @@
 				<div>
 					<button
 						v-if="uploadType == 'langsung'"
+						@click="openModalSave"
 						class="rounded text-white bg-Primary w-fit px-4 py-2 cursor-pointer hover:bg-PrimaryContainer hover:text-Primary duration-300">
 						Upload
 					</button>
@@ -258,6 +279,7 @@
 					</button>
 					<button
 						v-else-if="uploadType == 'edit'"
+						@click="openModalSave"
 						class="rounded text-white bg-Primary w-fit px-4 py-2 cursor-pointer hover:bg-PrimaryContainer hover:text-Primary duration-300">
 						Simpan
 					</button>
@@ -345,10 +367,22 @@
 			</div>
 		</div>
 	</div>
+	<!-- MODAL DETAIL CONTENT -->
+	<ModalDetailContent
+		:modalDetail="modalDetailContent"
+		:dataContent="dataContent"
+		:closeModal="closeModalDetail"
+		:saveContent="saveContent" />
 	<ModalShowPengumuman
 		:modalPengumuman="isModalPengumumanOpen"
+		:kontenType="kontenType"
 		:imageUrl="imageUrl"
 		:closeModal="closeModal" />
+	<NotificationModal
+		:modal-content="modalContent"
+		:modal-header="modalHeader"
+		:button-function="buttonFunction"
+		:is-open="isOpen" />
 </template>
 
 <script setup>
@@ -358,6 +392,7 @@
 	const canvasRef = ref(null)
 	const canvas = ref(null)
 	const canvasHeight = ref(0)
+	const canvasWidth = ref(0)
 	const fontSize = ref(0)
 	const fontWeight = ref("normal")
 	const canvasDivRef = ref(null)
@@ -367,27 +402,31 @@
 	const minimize = ref(false)
 	const uploadType = ref("")
 	const title = ref("")
-	const { getAnnouncement } = useAnnouncement()
+	const { getAnnouncement, addAnnouncement } = useAnnouncement()
 	const modalShowPengumuman = ref(null)
+	const modalDetailContent = ref(null)
 	const dataAnnouncement = ref(await getAnnouncement())
 	const currentUser = ref(null)
 	// OCR VAR
 	const imageUrl = ref("")
 	const isImageLoaded = ref(false)
-	const selectedWords = ref([])
 	let detectedWords = []
 	const containerRef = ref(null)
 	const loading = ref(false)
 	const loadingProgress = ref(0)
+	const kontenType = ref("")
 	onMounted(async () => {
 		currentUser.value = JSON.parse(sessionStorage.getItem("currentUser"))
 		if (process.client) {
+			const resizeObserver = new ResizeObserver(() => {
+				updateCanvasSize()
+			})
 			const { fabric } = await import("fabric")
-			ObjectWidth.value = canvasDivRef.value.clientWidth
-			ObjectHeigth.value = canvasDivRef.value.clientHeight
+			canvasHeight.value = canvasDivRef.value.clientHeight
+			canvasWidth.value = canvasDivRef.value.clientWidth
 			canvas.value = new fabric.Canvas(canvasRef.value, {
-				width: ObjectWidth.value,
-				height: ObjectHeigth.value,
+				width: canvasWidth.value,
+				height: canvasHeight.value,
 				backgroundColor: "white",
 			})
 			canvas.value.on("mouse:dblclick", (event) => {
@@ -400,22 +439,58 @@
 				if (event.target && event.target.type === "textbox") {
 					const textbox = event.target
 					fontSize.value = textbox.fontSize
+					fontWeight.value = textbox.fontWeight
 					ObjectWidth.value = textbox.width
 					ObjectHeigth.value = textbox.height
+				}
+			})
+			canvas.value.on("object:modified", (e) => {
+				const obj = e.target
+
+				if (obj && obj.type === "textbox") {
+					const trimmedText = obj.text.trim()
+					if (trimmedText === "") {
+						canvas.value.remove(obj)
+					}
 				}
 			})
 			canvas.value.on("mouse:up", (event) => {
 				console.log(event)
 			})
-			canvasHeight.value = canvasRef.value.clientHeight
+			// Observe the parent container
+			if (canvasDivRef.value) {
+				resizeObserver.observe(canvasDivRef.value)
+			}
+
+			onUnmounted(() => {
+				if (canvasDivRef.value) {
+					resizeObserver.unobserve(canvasDivRef.value)
+				}
+			})
 		}
 	})
+	const updateCanvasSize = () => {
+		if (canvas.value && canvasDivRef.value) {
+			const containerWidth = canvasDivRef.value.offsetWidth
+			const containerHeight = canvasDivRef.value.offsetHeight - 30
+
+			canvas.value.setWidth(containerWidth)
+			canvas.value.setHeight(containerHeight)
+			canvas.value.renderAll() // Re-render the canvas to apply changes
+		}
+	}
+
+	const changeSection = (section) => {
+		uploadType.value = section
+	}
 	const toggleModal = (modal) => {
 		modal.classList.toggle("hidden")
 	}
 	const openModalKonten = (data) => {
-		isModalPengumumanOpen.value = !isModalPengumumanOpen.value
 		imageUrl.value = data.an_url
+		kontenType.value = data.an_type
+		console.log(kontenType.value, imageUrl.value)
+		isModalPengumumanOpen.value = !isModalPengumumanOpen.value
 	}
 	const filteredAnnouncement = computed(() => {
 		return dataAnnouncement.value.filter((data) => {
@@ -446,7 +521,11 @@
 	}
 	// OCR FUNCTION
 	const performOCR = async () => {
+		const { fabric } = await import("fabric")
 		loading.value = true
+
+		canvas.value.clear()
+		// Perform OCR using Tesseract
 		const {
 			data: { words },
 		} = await Tesseract.recognize(imageUrl.value, "eng", {
@@ -455,45 +534,129 @@
 				updateProgress(m.progress)
 			},
 			preserve_interword_spaces: 1,
+			tessedit_char_whitelist: "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+			oem: 0,
 		})
-		const imgSize = await getImageSize(imageUrl.value)
+
+		// Get image size and initialize the canvas
+		const { img, imgWidth, imgHeight } = await setCanvasSizeToImage()
+
 		const containerWidth = containerRef.value.offsetWidth
 		const containerHeight = containerRef.value.offsetHeight
-		const widthRatio = containerWidth / imgSize.width
-		const heightRatio = containerHeight / imgSize.height
-		detectedWords = words.map((word) => ({
-			text: word.text,
+		const widthRatio = containerWidth / imgWidth
+		const heightRatio = containerHeight / imgHeight
+		canvas.value.setWidth(containerWidth)
+		canvas.value.setHeight(containerHeight)
+		// Container for textboxes, grouped by lines
+		let currentY = 0
+		const lineSpacing = 20 // Vertical space between lines
+		const lines = []
+		// Map and draw detected words
+		detectedWords = words.map((word) => {
+			// Calculate bbox using your original formula
 
-			bbox: {
+			const bbox = {
 				left: ((word.bbox.x0 * widthRatio) / containerWidth) * 100,
 				top: ((word.bbox.y0 * heightRatio) / containerHeight) * 100,
 				width: (((word.bbox.x1 - word.bbox.x0) * widthRatio) / containerWidth) * 100,
 				height: (((word.bbox.y1 - word.bbox.y0) * heightRatio) / containerHeight) * 100 + 0.5,
-			},
-			fontSize: Math.min((word.bbox.x1 - word.bbox.x0) * widthRatio, (word.bbox.y1 - word.bbox.y0) * heightRatio),
-			selected: false,
-		}))
+				line: word.line,
+			}
 
+			const fontSize =
+				Math.min((word.bbox.x1 - word.bbox.x0) * widthRatio, (word.bbox.y1 - word.bbox.y0) * heightRatio) * 1.7
+
+			const x = (bbox.left / 100) * containerWidth
+			const y = (bbox.top / 100) * containerHeight + fontSize
+			// Add word to the current line or start a new line
+			if (lines.length === 0 || y > lines[lines.length - 1].lastY + 10) {
+				lines.push({ lastY: y, fontSize, items: [{ x, text: word.text }] })
+			} else {
+				lines[lines.length - 1].items.push({ x, text: word.text })
+				lines[lines.length - 1].lastY = Math.min(lines[lines.length - 1].lastY, y)
+			}
+		})
+		// Create textboxes for each word
+		let currentLineY = 0
+		let rowText = ""
+		let textBoxes = null
+		lines.forEach((line) => {
+			const lineY = line.lastY
+			const fontsize = line.fontSize
+			if (currentLineY == 0) {
+				const text = new fabric.Textbox(rowText, {
+					left: 0,
+					width: containerWidth - 100,
+					top: 0,
+					fontSize: 16,
+					fill: "black",
+					hasControls: false,
+				})
+				textBoxes = text
+				rowText = ""
+				canvas.value.add(text)
+			} else if (currentLineY + 25 < lineY) {
+				const text = new fabric.Textbox(rowText, {
+					left: line.items[0].x,
+					width: containerWidth - 100,
+					top: textBoxes.top + textBoxes.height,
+					fontSize: 16,
+					fill: "black",
+					hasControls: false,
+				})
+				textBoxes = text
+				rowText = ""
+				canvas.value.add(text)
+			}
+			line.items.forEach((item) => {
+				rowText += item.text + " "
+			})
+			rowText += "\n"
+			currentLineY = lineY
+		})
+		// const text = new fabric.Textbox(rowText, {
+		// 	left: 0,
+		// 	width: containerWidth - 100,
+		// 	top: 0,
+		// 	fontSize: 15,
+		// 	fill: "black",
+		// 	hasControls: false,
+		// })
+		// canvas.value.add(text)
+		canvas.value.renderAll()
+		console.log(lines)
 		loading.value = false
 	}
 
+	const setCanvasSizeToImage = async () => {
+		return new Promise((resolve, reject) => {
+			const img = new Image()
+			img.src = imageUrl.value
+			img.onload = () => {
+				// Get the natural width and height of the image
+				const imgWidth = img.naturalWidth
+				const imgHeight = img.naturalHeight
+
+				// Set the canvas size to match the image size
+				const canvas = canvasRef.value
+				canvas.width = imgWidth
+				canvas.height = imgHeight
+				canvasHeight.value = imgHeight
+				canvasWidth.value = imgWidth
+				// Resolve with the image and its dimensions
+				resolve({ img, imgWidth, imgHeight })
+			}
+			img.onerror = (err) => {
+				console.error("Failed to load image", err)
+				reject(err)
+			}
+		})
+	}
 	const updateProgress = (progress) => {
 		loadingProgress.value = progress * 100
 		if (progress === 1) {
 			onImageLoad()
 		}
-	}
-	function getImageSize(url) {
-		return new Promise((resolve, reject) => {
-			const img = new Image()
-			img.src = url
-			img.onload = function () {
-				resolve({ width: this.width, height: this.height })
-			}
-			img.onerror = function () {
-				reject(new Error("Failed to load image"))
-			}
-		})
 	}
 
 	const previewUrl = ref(null)
@@ -501,6 +664,7 @@
 	const isVideo = ref(false)
 	function handleFileUpload(event) {
 		const file = event.target.files[0]
+		fileUpload.value = file
 		if (file) {
 			const fileType = file.type
 			if (fileType.startsWith("image/")) {
@@ -527,14 +691,40 @@
 		isVideo.value = false
 	}
 	// CANVAS FUNCTION
+	const minimizeFunction = () => {
+		canvasHeight.value = canvasDivRef.value.clientHeight
+		canvasWidth.value = canvasDivRef.value.clientWidth
+		minimize.value = !minimize.value
+	}
+	const resizeCanvas = () => {
+		const width = parseInt(canvasWidth.value, 10) || 800
+		const height = parseInt(canvasHeight.value, 10) || 600
+		canvas.value.setWidth(width)
+		canvas.value.setHeight(height)
+		canvas.value.calcOffset()
+		canvas.value.renderAll()
+	}
 	function fontSizeOnChange() {
 		const activeObject = canvas.value.getActiveObject()
+		console.log(activeObject)
 		if (activeObject && activeObject.type === "textbox") {
 			activeObject.fontSize = fontSize.value
 			canvas.value.renderAll()
+		} else {
+			activeObject._objects.forEach((object) => {
+				if (object && object.type === "textbox") {
+					object.fontSize = fontSize.value
+				}
+			})
+			canvas.value.renderAll()
 		}
 	}
-
+	function adjustVertically() {
+		const activeObject = canvas.value.getActiveObject()
+		activeObject._objects.forEach((object) => {
+			object.top = activeObject.top
+		})
+	}
 	function fontWeightOnChange() {
 		const activeObject = canvas.value.getActiveObject()
 		if (activeObject && activeObject.type === "textbox") {
@@ -563,30 +753,73 @@
 
 		canvas.value.add(rect)
 	}
-	const handleDragOver = (event) => {
-		event.preventDefault()
-		alert("drag")
-	}
-	const handleDrop = (event) => {
-		event.preventDefault()
-		alert("drag")
-		const file = event.dataTransfer.files[0]
-		if (file.type && file.type.indexOf("image") === 0) {
+	const addImageToCanvas = async (event) => {
+		const { fabric } = await import("fabric")
+		const file = event.target.files[0]
+		if (file) {
 			const reader = new FileReader()
-			reader.onload = function (event) {
-				const img = new Image()
-				img.onload = function () {
-					const fabricImg = new fabric.Image(img, {
-						left: event.clientX - canvasRef.value.getBoundingClientRect().left,
-						top: event.clientY - canvasRef.value.getBoundingClientRect().top,
+			reader.onload = (f) => {
+				fabric.Image.fromURL(f.target.result, (img) => {
+					// Optionally, you can set default size or scaling here
+					img.set({
+						left: 100,
+						top: 100,
+						selectable: true,
+						hasBorders: true,
+						hasControls: true,
 					})
-					canvas.add(fabricImg)
-				}
-				img.src = event.target.result
+					canvas.value.add(img)
+					canvas.value.setActiveObject(img)
+				})
 			}
 			reader.readAsDataURL(file)
-		} else {
-			alert("Please drop an image file.")
 		}
+	}
+
+	// Modal Show Detail Content before saved
+	const dataContent = ref(null)
+	const judulKonten = ref("")
+	const kategoriKonten = ref("")
+	const fileUpload = ref(null)
+	const openModalSave = () => {
+		dataContent.value = {
+			title: judulKonten.value,
+			category: kategoriKonten.value,
+			previewUrl: previewUrl.value,
+			file: fileUpload.value,
+			kontenType: isImage.value ? "image" : "video",
+		}
+		modalDetailContent.value = true
+	}
+	const saveContent = async () => {
+		// save content to database and passing file to resources/category
+
+		const result = await addAnnouncement(dataContent.value)
+		console.log(result)
+		if (result.statusCode == 200) {
+			openNotif("Success", result.body.message)
+		} else {
+			openNotif("Konten gagal disimpan", result.body.message)
+		}
+	}
+	const closeModalDetail = () => {
+		modalDetailContent.value = false
+	}
+	const modalContent = ref(null)
+	const modalHeader = ref(null)
+	const buttonFunction = () => {
+		isOpen.value = false
+		if (modalHeader.value == "Success") {
+			const router = useRouter()
+			router.go()
+		}
+		modalContent.value = null
+		modalHeader.value = null
+	}
+	const isOpen = ref(false)
+	const openNotif = (header, content) => {
+		modalContent.value = content
+		modalHeader.value = header
+		isOpen.value = true
 	}
 </script>

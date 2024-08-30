@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
 
 		// Write the buffer data to the file
 		fs.writeFileSync(filePath, buffer)
-		const editedFile = join(
+		const editedFile = path.join(
 			"/_nuxt/resources",
 			"PengumumanKegiatan",
 			`${fileId}`,

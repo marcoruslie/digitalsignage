@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.11.2",
+    "@types/handbrake-js": "^5.0.4",
     "@types/jsonwebtoken": "^9.0.6",
     "nuxt": "^3.12.3",
     "prisma": "^5.11.0",
@@ -24,15 +25,14 @@
     "date-fns": "^3.6.0",
     "fabric": "^5.3.0",
     "fs": "^0.0.1-security",
+    "handbrake-js": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
+    "jsqr": "^1.4.0",
     "path": "^0.12.7",
-    "pdf-lib": "^1.17.1",
-    "pdfjs-dist": "^4.1.392",
     "punycode": "^2.3.1",
-    "sharp": "^0.33.4",
+    "sharp": "^0.33.5",
     "socket.io": "^4.7.4",
     "socket.io-client": "^4.7.5",
-    "spotify-web-api-node": "^5.0.2",
     "tesseract.js": "^5.0.5"
   }
 }
