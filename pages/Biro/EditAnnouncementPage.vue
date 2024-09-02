@@ -82,12 +82,13 @@
 			</div>
 			<!-- Ekstraksi Teks -->
 			<div
-				:class="uploadType == 'ekstraksi' ? 'flex-grow' : 'hidden'"
+				v-if="uploadType == 'ekstraksi'"
 				class="flex-grow flex p-1 space-x-1 justify-end overflow-hidden">
 				<div class="w-[10%] min-w-[10%] max-h-full h-full flex-col flex items-center overflow-auto">
 					<div class="text-Primary font-bold text-lg">Property</div>
 					<div
 						class="flex flex-col flex-grow border border-black rounded w-full pt-2 items-center space-y-1 overflow-auto">
+						<!-- OBJECT SECTION -->
 						<div
 							class="hover:bg-PrimaryContainer hover:text-OnPrimaryContainer border-Primary border w-full p-1 cursor-pointer bg-Primary text-OnPrimary duration-300">
 							OBJECT
@@ -127,7 +128,15 @@
 								class="hidden"
 								@change="addImageToCanvas" />
 						</label>
-
+						<div
+							class="bg-PrimaryContainer border border-Primary text-OnPrimaryContainer hover:bg-Primary hover:text-OnPrimary text-center w-[100px] h-[55px] p-1 rounded shadow transition cursor-pointer">
+							<div>Background</div>
+							<input
+								v-model="backgroundColor"
+								type="color"
+								class="h-[25px] w-full" />
+						</div>
+						<!-- FONT SECTION -->
 						<div
 							class="hover:bg-PrimaryContainer hover:text-OnPrimaryContainer border-Primary border w-full p-1 cursor-pointer bg-Primary text-OnPrimary duration-300">
 							FONT
@@ -153,39 +162,40 @@
 							</option>
 						</select>
 						<div
-							class="bg-PrimaryContainer border border-Primary text-OnPrimaryContainer hover:bg-Primary hover:text-OnPrimary text-center w-[100px] h-[55px] p-1 rounded shadow transition cursor-pointer">
-							<div>Background</div>
-							<input
-								type="color"
-								class="h-[25px] w-full" />
-						</div>
-						<div
 							class="w-[100px] h-[55px] flex-col flex items-center cursor-pointer bg-PrimaryContainer border border-Primary text-OnPrimaryContainer hover:bg-Primary hover:text-OnPrimary p-1 rounded shadow transition">
 							<div>Font Color</div>
 							<input
+								v-model="fontColor"
 								type="color"
-								class="h-[45px] w-full" />
+								class="h-[25px] w-full" />
 						</div>
-
+						<!-- CANVAS CONTROL SIZE -->
 						<div
 							class="hover:bg-PrimaryContainer hover:text-OnPrimaryContainer border-Primary border w-full p-1 cursor-pointer bg-Primary text-OnPrimary duration-300">
 							CANVAS SIZE
 						</div>
-						<input
-							v-model="canvasWidth"
-							@input="resizeCanvas"
-							placeholder="Width"
-							type="number"
-							class="w-[100px] h-[55px] flex-col flex justify-center items-center cursor-pointer bg-PrimaryContainer border border-Primary text-OnPrimaryContainer hover:bg-Primary hover:text-OnPrimary py-2 px-4 rounded shadow transition" />
-						<input
-							v-model="canvasHeight"
-							@input="resizeCanvas"
-							placeholder="Height"
-							type="number"
-							class="w-[100px] h-[55px] flex-col flex justify-center items-center cursor-pointer bg-PrimaryContainer border border-Primary text-OnPrimaryContainer hover:bg-Primary hover:text-OnPrimary py-2 px-4 rounded shadow transition" />
+						<div>
+							Width
+							<input
+								v-model="canvasWidth"
+								@input="resizeCanvas"
+								placeholder="Width"
+								type="number"
+								class="w-[100px] h-[55px] flex-col flex justify-center items-center cursor-pointer bg-PrimaryContainer border border-Primary text-OnPrimaryContainer hover:bg-Primary hover:text-OnPrimary py-2 px-4 rounded shadow transition" />
+						</div>
+						<div>
+							Height
+							<input
+								v-model="canvasHeight"
+								@input="resizeCanvas"
+								placeholder="Height"
+								type="number"
+								class="w-[100px] h-[55px] flex-col flex justify-center items-center cursor-pointer bg-PrimaryContainer border border-Primary text-OnPrimaryContainer hover:bg-Primary hover:text-OnPrimary py-2 px-4 rounded shadow transition" />
+						</div>
 					</div>
 				</div>
 				<div
+					@loadeddata="updateCanvasSize"
 					ref="canvasDivRef"
 					class="w-[90%] max-h-full h-full flex-col flex items-center overflow-auto"
 					:class="!minimize ? 'max-w-[45%]' : 'max-w-full'">
@@ -198,7 +208,7 @@
 					:src="minimize == false ? '/icon-minimize.png' : '/icon-maximize.png'"
 					class="cursor-pointer w-10 h-10"
 					@click="minimizeFunction" />
-				<!-- Ekstraksi Konten -->
+				<!-- Preview Konten -->
 				<div
 					class="w-[45%] max-h-full h-full flex-col flex items-center overflow-hidden"
 					:class="!minimize ? 'max-w-full' : 'max-w-0'">
@@ -273,13 +283,8 @@
 						Upload
 					</button>
 					<button
-						v-else-if="uploadType == 'ekstraksi'"
-						class="rounded text-white bg-Primary w-fit px-4 py-2 cursor-pointer hover:bg-PrimaryContainer hover:text-Primary duration-300">
-						Ekstraksi
-					</button>
-					<button
-						v-else-if="uploadType == 'edit'"
-						@click="openModalSave"
+						v-else-if="uploadType != ''"
+						@click="toggleModal(modalSaveCanvas)"
 						class="rounded text-white bg-Primary w-fit px-4 py-2 cursor-pointer hover:bg-PrimaryContainer hover:text-Primary duration-300">
 						Simpan
 					</button>
@@ -367,6 +372,66 @@
 			</div>
 		</div>
 	</div>
+	<!-- MODAL SIMPAN CANVAS -->
+	<div
+		ref="modalSaveCanvas"
+		class="hidden overflow-x-hidden flex fixed top-0 right-0 left-0 z-10 justify-center items-center h-screen bg-black bg-opacity-50">
+		<div
+			class="p-4 w-3/4 max-w-6xl h-[calc(100vh-100px)] relative bg-white rounded-lg shadow sm:p-5 flex flex-col space-y-2">
+			<div class="flex justify-between items-center pb-4 rounded-t border-b">
+				<h3 class="text-lg font-semibold text-OnPrimaryContainer">Simpan Konten</h3>
+				<svg
+					@click="toggleModal(modalSaveCanvas)"
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-6 w-6 hover:cursor-pointer hover:bg-Primary hover:duration-500 hover:rounded-lg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor">
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M6 18L18 6M6 6l12 12" />
+				</svg>
+			</div>
+			<div class="flex-col flex-grow space-y-2 overflow-auto">
+				<label for="">Judul</label>
+				<input
+					v-model="judulKonten"
+					type="text"
+					class="rounded border-2 px-2 py-1 w-full" />
+				<label for="">Kategori</label>
+				<select
+					v-model="kategoriKonten"
+					class="rounded border-2 px-2 py-1 w-full">
+					<option
+						v-if="currentUser != null"
+						v-for="data in currentUser.role.categoryuser"
+						:disabled="
+							data.category.cat_name == 'Lowongan Magang' ||
+							data.category.cat_name == 'Pengumuman Kampus' ||
+							data.category.cat_name == 'Pengumuman Kegiatan' ||
+							data.category.cat_name == 'Lowongan Kerja'
+						"
+						:value="{ id: data.cu_cat_id, name: data.category.cat_name }">
+						{{ data.category.cat_name }}
+					</option>
+				</select>
+				<label for="">File Preview</label>
+				<div class="flex justify-center">
+					<img
+						v-if="canvas != null"
+						:src="previewUrl"
+						alt="" />
+				</div>
+			</div>
+			<button
+				@click="saveEditedCanvas"
+				class="bg-Primary text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer duration-300 rounded py-2">
+				SIMPAN
+			</button>
+		</div>
+	</div>
 	<!-- MODAL DETAIL CONTENT -->
 	<ModalDetailContent
 		:modalDetail="modalDetailContent"
@@ -398,6 +463,8 @@
 	const canvasDivRef = ref(null)
 	const ObjectWidth = ref(0)
 	const ObjectHeigth = ref(0)
+	const fontColor = ref("#000000")
+	const backgroundColor = ref("#ffffff")
 	// MODAL VAR
 	const minimize = ref(false)
 	const uploadType = ref("")
@@ -405,6 +472,7 @@
 	const { getAnnouncement, addAnnouncement } = useAnnouncement()
 	const modalShowPengumuman = ref(null)
 	const modalDetailContent = ref(null)
+	const modalSaveCanvas = ref(null)
 	const dataAnnouncement = ref(await getAnnouncement())
 	const currentUser = ref(null)
 	// OCR VAR
@@ -417,57 +485,6 @@
 	const kontenType = ref("")
 	onMounted(async () => {
 		currentUser.value = JSON.parse(sessionStorage.getItem("currentUser"))
-		if (process.client) {
-			const resizeObserver = new ResizeObserver(() => {
-				updateCanvasSize()
-			})
-			const { fabric } = await import("fabric")
-			canvasHeight.value = canvasDivRef.value.clientHeight
-			canvasWidth.value = canvasDivRef.value.clientWidth
-			canvas.value = new fabric.Canvas(canvasRef.value, {
-				width: canvasWidth.value,
-				height: canvasHeight.value,
-				backgroundColor: "white",
-			})
-			canvas.value.on("mouse:dblclick", (event) => {
-				if (event.target && event.target.type === "textbox") {
-					const textbox = event.target
-					textbox.enterEditing()
-				}
-			})
-			canvas.value.on("mouse:down", (event) => {
-				if (event.target && event.target.type === "textbox") {
-					const textbox = event.target
-					fontSize.value = textbox.fontSize
-					fontWeight.value = textbox.fontWeight
-					ObjectWidth.value = textbox.width
-					ObjectHeigth.value = textbox.height
-				}
-			})
-			canvas.value.on("object:modified", (e) => {
-				const obj = e.target
-
-				if (obj && obj.type === "textbox") {
-					const trimmedText = obj.text.trim()
-					if (trimmedText === "") {
-						canvas.value.remove(obj)
-					}
-				}
-			})
-			canvas.value.on("mouse:up", (event) => {
-				console.log(event)
-			})
-			// Observe the parent container
-			if (canvasDivRef.value) {
-				resizeObserver.observe(canvasDivRef.value)
-			}
-
-			onUnmounted(() => {
-				if (canvasDivRef.value) {
-					resizeObserver.unobserve(canvasDivRef.value)
-				}
-			})
-		}
 	})
 	const updateCanvasSize = () => {
 		if (canvas.value && canvasDivRef.value) {
@@ -482,9 +499,18 @@
 
 	const changeSection = (section) => {
 		uploadType.value = section
+		if (section != "langsung") {
+			setUpCanvas()
+		}
 	}
 	const toggleModal = (modal) => {
 		modal.classList.toggle("hidden")
+		if (modal == modalSaveCanvas.value) {
+			previewUrl.value = canvas.value.toDataURL({
+				format: "png",
+				quality: 1.0,
+			})
+		}
 	}
 	const openModalKonten = (data) => {
 		imageUrl.value = data.an_url
@@ -653,12 +679,62 @@
 		})
 	}
 	const updateProgress = (progress) => {
-		loadingProgress.value = progress * 100
+		loadingProgress.value = Math.floor(progress * 100)
 		if (progress === 1) {
 			onImageLoad()
 		}
 	}
+	const setUpCanvas = async () => {
+		const resizeObserver = new ResizeObserver(() => {
+			updateCanvasSize()
+		})
+		const { fabric } = await import("fabric")
+		canvasHeight.value = canvasDivRef.value.clientHeight
+		canvasWidth.value = canvasDivRef.value.clientWidth
+		canvas.value = new fabric.Canvas(canvasRef.value, {
+			width: canvasWidth.value,
+			height: canvasHeight.value,
+			backgroundColor: "white",
+		})
+		canvas.value.on("mouse:dblclick", (event) => {
+			if (event.target && event.target.type === "textbox") {
+				const textbox = event.target
+				textbox.enterEditing()
+			}
+		})
+		canvas.value.on("mouse:down", (event) => {
+			if (event.target && event.target.type === "textbox") {
+				const textbox = event.target
+				fontSize.value = textbox.fontSize
+				fontWeight.value = textbox.fontWeight
+				ObjectWidth.value = textbox.width
+				ObjectHeigth.value = textbox.height
+			}
+		})
+		canvas.value.on("object:modified", (e) => {
+			const obj = e.target
 
+			if (obj && obj.type === "textbox") {
+				const trimmedText = obj.text.trim()
+				if (trimmedText === "") {
+					canvas.value.remove(obj)
+				}
+			}
+		})
+		canvas.value.on("mouse:up", (event) => {
+			console.log(event)
+		})
+		// Observe the parent container
+		if (canvasDivRef.value) {
+			resizeObserver.observe(canvasDivRef.value)
+		}
+
+		onUnmounted(() => {
+			if (canvasDivRef.value) {
+				resizeObserver.unobserve(canvasDivRef.value)
+			}
+		})
+	}
 	const previewUrl = ref(null)
 	const isImage = ref(false)
 	const isVideo = ref(false)
@@ -692,8 +768,6 @@
 	}
 	// CANVAS FUNCTION
 	const minimizeFunction = () => {
-		canvasHeight.value = canvasDivRef.value.clientHeight
-		canvasWidth.value = canvasDivRef.value.clientWidth
 		minimize.value = !minimize.value
 	}
 	const resizeCanvas = () => {
@@ -782,20 +856,38 @@
 	const kategoriKonten = ref("")
 	const fileUpload = ref(null)
 	const openModalSave = () => {
+		if (uploadType.value == "langsung") {
+			dataContent.value = {
+				title: judulKonten.value,
+				category: kategoriKonten.value,
+				previewUrl: previewUrl.value,
+				file: fileUpload.value,
+				kontenType: isImage.value ? "image" : "video",
+				type: "file",
+			}
+			modalDetailContent.value = true
+		}
+	}
+	const saveEditedCanvas = async () => {
 		dataContent.value = {
 			title: judulKonten.value,
 			category: kategoriKonten.value,
 			previewUrl: previewUrl.value,
-			file: fileUpload.value,
-			kontenType: isImage.value ? "image" : "video",
+			kontenType: "image",
+			file: "",
+			type: "canvas",
 		}
-		modalDetailContent.value = true
+		const result = await addAnnouncement(dataContent.value)
+		if (result.statusCode == 200) {
+			openNotif("Success", result.body.message)
+		} else {
+			openNotif("Konten gagal disimpan", result.body.message)
+		}
 	}
 	const saveContent = async () => {
 		// save content to database and passing file to resources/category
 
 		const result = await addAnnouncement(dataContent.value)
-		console.log(result)
 		if (result.statusCode == 200) {
 			openNotif("Success", result.body.message)
 		} else {

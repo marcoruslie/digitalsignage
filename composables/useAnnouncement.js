@@ -34,14 +34,12 @@ export default () => {
 	}
 	const addAnnouncement = async (data) => {
 		const formData = new FormData()
-		// title: judulKonten.value,
-		// 	category: kategoriKonten.value,
-		// 	previewUrl: previewUrl.value,
-		// 	kontenType: isImage.value ? "image" : "video",
 		formData.append("title", data.title)
 		formData.append("file", data.file)
 		formData.append("category", JSON.stringify(data.category))
 		formData.append("kontenType", data.kontenType)
+		formData.append("previewUrl", data.previewUrl)
+		formData.append("type", data.type)
 		const result = await $fetch("/api/announcement/createAnnouncement", {
 			method: "POST",
 			body: formData,
