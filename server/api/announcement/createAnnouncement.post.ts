@@ -31,7 +31,8 @@ export default defineEventHandler(async (event) => {
 		fileUrl: fileUrl ? fileUrl.data.toString() : "",
 		file: file,
 	}
-
+	
+	let finalFilePath = ""
 	try {
 		await prisma.$transaction(async (prisma) => {
 			const announcement = await prisma.announcement.create({
@@ -45,23 +46,26 @@ export default defineEventHandler(async (event) => {
 
 			const newNameField = announcement.an_id
 			const kategori = dataAnnouncement.cat_name
-			const extCek = path.extname(announcement.an_id).toLowerCase()
 			let ext = ""
-			if (extCek === "") {
-				ext = ".png"
-			} else {
+			if(saveType.data.toString() === "file") {
+				
+				const extCek = path.extname(file.filename).toLowerCase()
 				ext = extCek
 			}
-
+			else{
+				ext = ".png"
+			}
+			console.log(ext)
 			const tempDir = tmpdir()
-			const tempFilePath = path.join(tempDir, announcement.an_id)
+			const tempFilePath = path.join(tempDir, `${announcement.an_id}${ext}`)
 			const resourcesDir = path.resolve(`resources/${kategori}`)
 			const accFilePath = path.join("/_nuxt", "resources", `${kategori}`, `${newNameField}${ext}`)
 			const newFilePath = path.join(resourcesDir, `${newNameField}${ext}`)
-			if (saveType.data === "file") {
+			finalFilePath = newFilePath
+			if (saveType.data.toString() === "file") {
 				try {
-					await fs.writeFile(tempFilePath, file.data)
-
+					
+					await fs.writeFile(tempFilePath,file.data)
 					await fs.mkdir(resourcesDir, { recursive: true })
 
 					if ([".jpg", ".jpeg", ".png", ".webp"].includes(ext)) {
@@ -83,10 +87,8 @@ export default defineEventHandler(async (event) => {
 					} else {
 						throw new Error("Unsupported file type")
 					}
-
-					// Optionally, delete the temporary file
-					await fs.unlink(tempFilePath)
 				} catch (error) {
+					console.warn(tempFilePath)
 					console.error("Error processing the file:", error)
 					throw new Error("Failed to compress and save the file")
 				}
@@ -102,7 +104,6 @@ export default defineEventHandler(async (event) => {
 					throw new Error("Failed to compress and save the file")
 				}
 			}
-
 			await prisma.announcement.update({
 				where: {
 					an_id: announcement.an_id,
@@ -120,11 +121,12 @@ export default defineEventHandler(async (event) => {
 			},
 		}
 	} catch (error: any) {
+		await fs.unlink(finalFilePath)
 		console.error("Error creating announcement:", error.message)
 		return {
 			statusCode: 400,
 			body: {
-				message: error.message,
+				message: "File terlalu besar atau format tidak didukung",
 			},
 		}
 	}

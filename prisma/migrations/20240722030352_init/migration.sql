@@ -157,3 +157,8 @@ ALTER TABLE `Announcement_in_List` ADD CONSTRAINT `Announcement_in_List_ail_la_i
 
 -- AddForeignKey
 ALTER TABLE `Announcement` ADD CONSTRAINT `Announcement_an_cat_id_fkey` FOREIGN KEY (`an_cat_id`) REFERENCES `Category`(`cat_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- InsertRoleData
+INSERT INTO `Role` (`role_id`, `role_name`) VALUES ('AdminDigitalSignage', 'Admin');
+-- InsertUserData
+INSERT INTO `User` (`us_username`, `us_password`, `us_role_id`) VALUES ('admin', 'admin', 'AdminDigitalSignage');
