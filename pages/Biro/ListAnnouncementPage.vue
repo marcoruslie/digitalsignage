@@ -8,7 +8,7 @@
 				<div class="text-Primary font-bold text-2xl">Daftar List Pengumuman</div>
 				<div class="flex">
 					<div class="relative">
-						<input type="text" placeholder="Search..."
+						<input v-model="searchedList" type="text" placeholder="Search..."
 							class="block w-full py-2 pl-10 pr-4 leading-tight bg-white border border-gray-300 rounded focus:outline-none focus:bg-white focus:border-gray-500" />
 						<div class="absolute inset-y-0 left-0 flex items-center pl-3">
 							<svg class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -26,7 +26,7 @@
 			<div class="flex-grow flex-col p-1 space-y-1">
 				<!-- List - List Pengumuman -->
 				<div v-if="currentUser != null" v-for="(data, index) in dataListAnnouncement.filter(
-					(item) => item.la_us_username == currentUser.us_username
+					(item) => item.la_us_username == currentUser.us_username && item.la_title.toLowerCase().includes(searchedList.toLowerCase())
 				)" class="h-[100px] w-full rounded shadow-xl flex items-center justify-between space-x-3 px-2">
 					<div class="flex items-center space-x-3 justify-between w-full">
 						<!-- <div class="w-[100px] h-[100px] bg-PrimaryContainer rounded-l">
@@ -68,13 +68,13 @@
 			</div>
 			<!-- Image Slider -->
 			<div class="relative flex items-center justify-center flex-grow overflow-auto">
-				<div class="overflow-auto w-2/3 h-full">
-					<div class="flex transition-transform duration-500 ease-in-out"
+				<div class="overflow-hidden w-2/3 h-full">
+					<div class="flex h-full transition-transform duration-500 ease-in-out"
 						:style="{ transform: `translateX(-${currentIndex * 100}%)` }">
 						<!-- Loop through images -->
 						<div v-if="dataAnnouncementInList != null"
 							v-for="(data, index) in dataAnnouncementInList.announcement_in_list" :key="index"
-							class="flex-shrink-0 w-full h-1/2 flex justify-center items-center">
+							class="flex-shrink-0 w-full h-full flex justify-center items-center">
 							<img v-if="data.announcement.an_type == 'image'" :src="data.announcement.an_url"
 								alt="Announcement Image"
 								class="max-w-full max-h-full object-contain rounded-lg shadow-xl" />
@@ -187,7 +187,7 @@
 					</div>
 					<!-- Kategori kegiatan kampus -->
 					<div v-else-if="kategori.name.toUpperCase() == 'pengumuman kegiatan'.toUpperCase()"
-						v-for="(data, index) in dataLaporanBAK"
+						v-for="(data, index) in dataLaporanBAK.filter((item) => item.poster_preview_link != null)"
 						class="h-[100px] w-full rounded shadow-xl hover:bg-slate-50 flex items-center justify-between space-x-3">
 						<div class="flex items-center space-x-3 w-full" @click="">
 							<div class="flex-col w-full">
@@ -200,7 +200,8 @@
 									<div class="w-full">
 										<div>Lokasi : {{ data.keg_tempat }}</div>
 										<div>
-											Start : {{ data.keg_tanggal_start }} Deadline : {{ data.keg_tanggal_end }}
+											Start : {{ convertDate(data.keg_tanggal_start) }} Deadline : {{
+												convertDate(data.keg_tanggal_end) }}
 										</div>
 									</div>
 									<div v-if="data.poster_preview_link != null"
@@ -260,11 +261,16 @@
 		:closeModal="closeModal" />
 	<NotificationModal :modalHeader="modalHeader" :modalContent="modalContent" :buttonFunction="buttonNotification"
 		:isOpen="isOpen" />
+	<Loading :loading="onLoading" :message="loadingMessage" />
 </template>
 
 <script setup>
+import { set } from 'date-fns';
+const searchedList = ref("")
+const onLoading = ref(false)
+const loadingMessage = ref("")
 const currentIndex = ref(0)
-
+const { getUserData } = useUser()
 const { getLaporanBAK, getPengumuman, getLowongan } = useDataISTTS()
 const { getCategory } = useCategory()
 const { getListAnnouncement, addListAnnouncement, deleteListAnnouncement, getAnnouncement } = useAnnouncement()
@@ -301,23 +307,21 @@ const imageUrl = ref(null)
 const kontenType = ref(null)
 const selectedItems = ref([])
 
-onBeforeMount(() => {
+onBeforeMount(async () => {
 	const router = useRouter();
 	if (sessionStorage.getItem('currentUser') != null) {
-		currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
-		if (currentUser.role.role_name == 'Admin') {
-			router.push('Admin/MasterScreenPage')
+		const token = sessionStorage.getItem('currentUser')
+		currentUser.value = await getUserData(token)
+		if (currentUser.value == null) {
+			router.push('/')
 		}
-		else {
-			router.push('Biro/ListAnnouncementPage')
+		else if (currentUser.value.role.role_name == "Admin") {
+			router.push('/Admin/MasterScreenPage')
 		}
 	}
 	else {
 		router.push('/')
 	}
-})
-onMounted(async () => {
-	currentUser.value = JSON.parse(sessionStorage.getItem("currentUser"))
 })
 watch(kategori, () => {
 	selectedItems.value = []
@@ -350,7 +354,8 @@ const openModalLowongan = (data) => {
 const openModalKegiatan = (data) => {
 	isModalPengumumanOpen.value = !isModalPengumumanOpen.value
 	kontenType.value = "image"
-	const link = `https://drive.google.com/thumbnail?id=${data.poster_link}&sz=h100`
+
+	const link = `https://drive.google.com/thumbnail?id=${data.poster_link}&sz=w1000`
 	imageUrl.value = link
 }
 const openModalKonten = (data) => {
@@ -439,16 +444,17 @@ const tambahListPengumuman = async () => {
 		currentUser: currentUser.value.us_username,
 		announcements: dataItem,
 	}
-
-	addListAnnouncement(data)
-		.then((result) => {
-			openNotif("Berhasil", result.body.message)
-		})
-		.catch((err) => {
-			openNotif("Error", err.response.data.message)
-		})
+	setLoadingState(true, "Menambahkan List Pengumuman")
+	const result = await addListAnnouncement(data)
+	setLoadingState(false)
+	if (result.statusCode == 200) {
+		openNotif("Berhasil", result.body.message)
+	} else {
+		openNotif("Error", result.body.message)
+	}
 }
 const hapusListPengumuman = async (data) => {
+	setLoadingState(true, "Menghapus List Pengumuman")
 	const result = await deleteListAnnouncement(data)
 	console.log(result)
 	if (result.status == 200) {
@@ -472,6 +478,11 @@ const prevSlide = () => {
 const convertDate = (date) => {
 	const options = { year: "numeric", month: "long", day: "numeric" }
 	return new Date(date).toLocaleDateString("id-ID", options)
+}
+// LOADING STATE
+const setLoadingState = (isLoading, message = "") => {
+	onLoading.value = isLoading
+	loadingMessage.value = message
 }
 </script>
 <style>

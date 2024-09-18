@@ -26,10 +26,10 @@
 					<!-- Kategori -->
 					<select class="rounded border px-4 py-2" v-model="kategoriKonten" placeholder="Pilih Kategori">
 						<option v-for="data in currentUser.role.categoryuser" :disabled="data.category.cat_name == 'Lowongan Magang' ||
-			data.category.cat_name == 'Pengumuman Kampus' ||
-			data.category.cat_name == 'Pengumuman Kegiatan' ||
-			data.category.cat_name == 'Lowongan Kerja'
-			" :value="{ id: data.cu_cat_id, name: data.category.cat_name }">
+							data.category.cat_name == 'Pengumuman Kampus' ||
+							data.category.cat_name == 'Pengumuman Kegiatan' ||
+							data.category.cat_name == 'Lowongan Kerja'
+							" :value="{ id: data.cu_cat_id, name: data.category.cat_name }">
 							{{ data.category.cat_name }}
 						</option>
 					</select>
@@ -309,23 +309,23 @@
 										<div>
 											Tanggal :
 											{{
-			new Date(data.createdAt).toLocaleDateString("en-GB", {
-				day: "2-digit",
-				month: "long",
-				year: "numeric",
-			})
-		}}
+												new Date(data.createdAt).toLocaleDateString("en-GB", {
+													day: "2-digit",
+													month: "long",
+													year: "numeric",
+												})
+											}}
 										</div>
 										<div>
 											Jam :
 											{{
-				new Date(data.createdAt).toLocaleTimeString("en-US", {
-					hour: "2-digit",
-					minute: "2-digit",
-					hour12: false,
-					timeZone: "Asia/Jakarta",
-				})
-			}}
+												new Date(data.createdAt).toLocaleTimeString("en-US", {
+													hour: "2-digit",
+													minute: "2-digit",
+													hour12: false,
+													timeZone: "Asia/Jakarta",
+												})
+											}}
 											WIB
 										</div>
 									</div>
@@ -362,10 +362,10 @@
 				<label for="">Kategori</label>
 				<select required v-model="kategoriKonten" class="rounded border-2 px-2 py-1 w-full">
 					<option v-if="currentUser != null" v-for="data in currentUser.role.categoryuser" :disabled="data.category.cat_name == 'Lowongan Magang' ||
-			data.category.cat_name == 'Pengumuman Kampus' ||
-			data.category.cat_name == 'Pengumuman Kegiatan' ||
-			data.category.cat_name == 'Lowongan Kerja'
-			" :value="{ id: data.cu_cat_id, name: data.category.cat_name }">
+						data.category.cat_name == 'Pengumuman Kampus' ||
+						data.category.cat_name == 'Pengumuman Kegiatan' ||
+						data.category.cat_name == 'Lowongan Kerja'
+						" :value="{ id: data.cu_cat_id, name: data.category.cat_name }">
 						{{ data.category.cat_name }}
 					</option>
 				</select>
@@ -393,6 +393,7 @@
 
 <script setup>
 import Tesseract from "tesseract.js"
+const { getUserData } = useUser()
 // canvas right
 let canvasRight
 const canvasRightDiv = ref(null)
@@ -431,18 +432,19 @@ const onLoading = ref(false)
 const loadingMessage = ref("")
 const loadingProgress = ref(0)
 const kontenType = ref("")
-onBeforeMount(() => {
-    const router = useRouter();
-    if (sessionStorage.getItem('currentUser') != null) {
-        currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
-        if (currentUser.role.role_name == 'Admin') {
-            router.push('Admin/MasterScreenPage')
-        }
-        else {
-            router.push('Biro/ListAnnouncementPage')
-        }
-    }
-	else{
+onBeforeMount(async () => {
+	const router = useRouter();
+	if (sessionStorage.getItem('currentUser') != null) {
+		const token = sessionStorage.getItem('currentUser')
+		currentUser.value = await getUserData(token)
+		if (currentUser.value == null) {
+			router.push('/')
+		}
+		else if (currentUser.value.role.role_name == "Admin") {
+			router.push('/Admin/MasterScreenPage')
+		}
+	}
+	else {
 		router.push('/')
 	}
 })
@@ -514,7 +516,7 @@ const performOCR = async () => {
 	loading.value = true
 
 	canvasLeft.clear()
-	canvasRight.value.clear()
+	canvasRight.clear()
 	// Perform OCR using Tesseract
 	const {
 		data: { words },
@@ -611,6 +613,7 @@ const performOCR = async () => {
 }
 const processOCR = async () => {
 	const { fabric } = await import("fabric")
+	canvasRight.clear()
 	const containerWidth = canvasRightDiv.value.clientWidth;
 	const containerHeight = canvasRightDiv.value.clientHeight;
 	fabric.Image.fromURL(imageUrl.value, (img) => {
@@ -628,13 +631,14 @@ const processOCR = async () => {
 		}
 
 	});
+	setLoadingState(true, "Processing OCR...");
 	const result = await Tesseract.recognize(imageUrl.value, 'eng', {
 		logger: (m) => {
 			console.log(m)
 			updateProgress(m.progress)
 		},
 	});
-
+	setLoadingState(false);
 	const { words } = result.data;
 
 	// Add the OCR result to the right canvas (with selectable text)

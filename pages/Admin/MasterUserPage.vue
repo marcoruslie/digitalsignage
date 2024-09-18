@@ -42,7 +42,7 @@
 				<!-- User Data Section -->
 				<div class="flex flex-col flex-grow overflow-auto">
 					<!-- Display User Data Here -->
-					<div v-for="user in users" :key="user.id" class="flex items-center hover:bg-gray-100 py-2 px-4">
+					<div v-for="user in users" class="flex items-center hover:bg-gray-100 py-2 px-4">
 						<div class="flex-1">{{ user.us_username }}</div>
 						<div class="flex-1">{{ user.role.role_name }}</div>
 						<div class="flex-1">
@@ -56,7 +56,7 @@
 								class="rounded bg-Primary py-2 px-5 text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer">
 								Edit
 							</button>
-							<button @click="deleteUserModal(user)"
+							<button v-if="user.role.role_name != 'Admin'" @click="deleteUserModal(user)"
 								class="rounded bg-red-700 py-2 px-2 text-OnPrimary hover:bg-red-900">
 								Delete
 							</button>
@@ -88,7 +88,7 @@
 				<!-- User Role Section -->
 				<div class="flex flex-col flex-grow overflow-auto">
 					<!-- Display Role Data Here -->
-					<div v-for="role in roles" :key="role.role_id"
+					<div v-for="role in roles.filter((item) => item.role_name != 'Admin')" :key="role.role_id"
 						class="flex items-center hover:bg-gray-100 py-2 px-4">
 						<div class="flex-1">{{ role.role_name }}</div>
 						<div class="flex-1">
@@ -199,13 +199,13 @@
 				</svg>
 			</div>
 			<div class="flex flex-col space-y-2">
-				<form @submit.prevent="editUser">
+				<form @submit.prevent="editUserFunct">
 					<div class="flex flex-col space-y-2 text-OnPrimaryContainer">
 						<div class="flex flex-col">
 							<label for="userName">Nama User</label>
 							<input type="text" v-model="userName"
 								class="px-2 border-2 border-OnPrimaryContainer hover:border-Primary rounded-md hover:duration-300 h-10"
-								required />
+								required :disabled="userName == 'admin'" />
 						</div>
 						<div class="flex flex-col">
 							<label for="password">Password</label>
@@ -213,12 +213,12 @@
 								class="px-2 border-2 border-OnPrimaryContainer hover:border-Primary rounded-md hover:duration-300 h-10"
 								required />
 						</div>
-						<div class="flex flex-col">
+						<div class="flex flex-col" v-if="userName != 'admin'">
 							<label for="roles">Role</label>
-							<select name="" id="">
-								<div v-for="item in roles" :key="item.role_id">
+							<select name="" id="" v-model="role_id">
+								<option v-for="item in roles" :key="item.role_id">
 									{{ item.role_name }}
-								</div>
+								</option>
 							</select>
 						</div>
 						<div class="flex justify-center">
@@ -331,7 +331,7 @@
 </template>
 
 <script setup>
-const { getUser, createUser, deleteUser, getRole, createRole, deleteRole } = useUser()
+const { getUser, createUser, deleteUser, getRole, createRole, deleteRole, editUser, getUserData } = useUser()
 // Declare user parameter
 const userName = ref("")
 const password = ref("")
@@ -342,6 +342,7 @@ const users = ref(await getUser())
 
 const selectedUser = ref(null)
 const selectedRole = ref(null)
+const currentUser = ref(null)
 // Define modal variable
 const modalAddUser = ref(null)
 const modalAddRole = ref(null)
@@ -396,19 +397,17 @@ const continueEvent = () => {
 	}
 }
 onBeforeMount(async () => {
-	currentUser.value = JSON.parse(sessionStorage.getItem("currentUser"))
 	const router = useRouter()
+	const token = sessionStorage.getItem("currentUser")
+	currentUser.value = await getUserData(token)
 	if (currentUser.value == null) {
 		router.push("/")
 	}
-	else if (currentUser.value.us_role != "admin") {
+	else if (currentUser.value.role.role_name !== "Admin") {
 		router.push("/Biro/ListAnnouncementPage")
 	}
 })
 // Fetch user data on component mount
-onMounted(async () => {
-	console.log(users.value)
-})
 const toggleModal = (modal) => {
 	modal.classList.toggle("hidden")
 }
@@ -421,7 +420,20 @@ function formatDate(dateString) {
 		day: "numeric",
 	})
 }
-
+const editUserFunct = async () => {
+	const userData = {
+		us_username: userName.value,
+		us_password: password.value,
+		role_id: role_id.value,
+	}
+	editUser(userData)
+		.then((response) => {
+			openNotif("Success", "User berhasil diubah")
+		})
+		.catch((error) => {
+			openNotif("Error", "User gagal diubah")
+		})
+}
 async function addNewUser() {
 	try {
 		const user = {
@@ -442,25 +454,28 @@ async function addNewUser() {
 		console.error("Error creating user:", error)
 	}
 }
-async function editUser(userId) {
-	// Redirect to edit user page
-}
 
 async function addNewRole() {
 	try {
-		const role = {
-			role_name: role_name.value,
-		}
-		// Replace with actual API call to create role
-		createRole(role)
-			.then((response) => {
-				openNotif("Success", "Role berhasil ditambahkan")
-			})
-			.catch((error) => {
-				openNotif("Error", "Role gagal ditambahkan")
-			})
+		if (role_name.value == "Admin" || role_name.value == "admin") {
+			openNotif("Error", "Role gagal ditambahkan")
 
-		console.log(response)
+		}
+		else {
+			const role = {
+				role_name: role_name.value,
+			}
+			// Replace with actual API call to create role
+			createRole(role)
+				.then((response) => {
+					openNotif("Success", "Role berhasil ditambahkan")
+				})
+				.catch((error) => {
+					openNotif("Error", "Role gagal ditambahkan")
+				})
+
+			console.log(response)
+		}
 	} catch (error) {
 		console.error("Error creating role:", error)
 	}
@@ -474,7 +489,11 @@ function deleteRoleModal(role) {
 	openDeleteNotif("Delete Role", roleData)
 }
 function editUserModal(user) {
-	openNotif("Error", "User gagal diubah")
+	userName.value = user.us_username
+	password.value = user.us_password
+	role_id.value = user.role.role_id
+	modalEditUser.value.classList.toggle("hidden")
+
 }
 function deleteUserModal(user) {
 	selectedUser.value = user
@@ -486,11 +505,7 @@ function deleteUserModal(user) {
 	openDeleteNotif("Delete User", userData)
 }
 </script>
-
 <style scoped>
-/* Add your scoped styles here */
-</style>
-<style>
 /* Scrollbar track */
 ::-webkit-scrollbar-track {
 	background-color: #f1f1f1;

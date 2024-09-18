@@ -65,11 +65,13 @@ io.on("connection", async (socket) => {
           "Music successfully changed to " + title
         );
       }
-      listMusicClient.push({
-        socket_ip: getSocketRooms(socket.id),
-        title: title,
-        musicId: musicId,
-      });
+      if (getSocketRooms(socket.id) != "") {
+        listMusicClient.push({
+          socket_ip: getSocketRooms(socket.id),
+          title: title,
+          musicId: musicId,
+        });
+      }
     }
   });
   socket.on("resDataReminder", async (data) => {
@@ -81,10 +83,12 @@ io.on("connection", async (socket) => {
       if (index !== -1) {
         listReminderClient.splice(index, 1);
       }
-      listReminderClient.push({
-        socket_ip: getSocketRooms(socket.id),
-        reminder: data,
-      });
+      if (getSocketRooms(socket.id) != "") {
+        listReminderClient.push({
+          socket_ip: getSocketRooms(socket.id),
+          reminder: data,
+        });
+      }
     }
   });
   socket.on("success", async (data) => {
@@ -113,13 +117,15 @@ io.on("connection", async (socket) => {
 
         const fullPath = path.join(
           process.cwd(),
-          fileUrl.replace("\\_nuxt", "")
+          fileUrl.replace("\\_nuxt\\", "")
         );
-
+        const deleteNuxt = fileUrl.replace("\\_nuxt\\", "");
+        const passUrl = deleteNuxt.replace(/\\/g, "/");
         const data = fs.readFileSync(fullPath);
         const annData = {
           an_id: ann.announcement.an_id,
           kategori: item.category.cat_name.replace(" ", ""),
+          fileUrl: passUrl,
           an_type: ann.announcement.an_type,
           an_fileName: ann.announcement.an_url.split("\\").pop(),
           fileData: data.toString("base64"),
@@ -131,7 +137,8 @@ io.on("connection", async (socket) => {
       io.to(data.screen[i].ip).emit("receiveFiles", {
         files: fileData,
         date: data.screen[i].date,
-        jsonData: data.jsonData,
+        jsonData: data.screen[i].jsonData,
+        template: data.screen[i].template,
       });
     }
   });

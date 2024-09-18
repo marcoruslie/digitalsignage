@@ -9,7 +9,10 @@ export default defineNuxtConfig({
   //     }]
   //   }
   // }
-  modules: ['@nuxtjs/tailwindcss'],
+  modules: ["@nuxtjs/tailwindcss"],
 
-  compatibilityDate: '2024-07-08'
-})
+  compatibilityDate: "2024-07-08",
+  build: {
+    transpile: ["jsonwebtoken"],
+  },
+});

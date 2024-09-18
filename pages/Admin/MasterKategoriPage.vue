@@ -154,7 +154,7 @@
 
 <script setup>
 const { addCategory, getAllCategory, editCategory, setActiveCategory } = useCategory()
-const { getRole } = useUser()
+const { getRole, getUserData } = useUser()
 // MODAL NOTIFICATION VARIABLE
 const modalHeader = ref("")
 const modalContent = ref("")
@@ -170,12 +170,13 @@ const categoryDuration = ref(0)
 const categoryId = ref("")
 const categoryUser = ref([])
 onBeforeMount(async () => {
-	currentUser.value = JSON.parse(sessionStorage.getItem("currentUser"))
 	const router = useRouter()
+	const token = sessionStorage.getItem("currentUser")
+	currentUser.value = await getUserData(token)
 	if (currentUser.value == null) {
 		router.push("/")
 	}
-	else if (currentUser.value.us_role != "admin") {
+	else if (currentUser.value.role.role_name !== "Admin") {
 		router.push("/Biro/ListAnnouncementPage")
 	}
 })

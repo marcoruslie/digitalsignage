@@ -30,22 +30,25 @@
         :isOpen="isOpen" />
 </template>
 <script setup>
-const { loginUser } = useUser()
+const { loginUser, getUserData } = useUser()
 const username = ref('');
 const password = ref('');
 const isOpen = ref(false);
 const modalHeader = ref('');
 const modalContent = ref('');
 let currentUser;
-onBeforeMount(() => {
+onBeforeMount(async () => {
     const router = useRouter();
     if (sessionStorage.getItem('currentUser') != null) {
-        currentUser = JSON.parse(sessionStorage.getItem('currentUser'))
-        if (currentUser.role.role_name == 'Admin') {
-            router.push('Admin/MasterScreenPage')
-        }
-        else {
-            router.push('Biro/ListAnnouncementPage')
+        const token = sessionStorage.getItem('currentUser')
+        currentUser = await getUserData(token)
+        if (currentUser != null) {
+            if (currentUser.role.role_name == 'Admin') {
+                router.push('Admin/MasterScreenPage')
+            }
+            else {
+                router.push('Biro/ListAnnouncementPage')
+            }
         }
     }
 })
@@ -55,8 +58,12 @@ async function login() {
         us_username: username.value,
         us_password: password.value
     }
-    currentUser = await loginUser(user)
+    const token = await loginUser(user)
+    if (token != null) {
+        currentUser = await getUserData(token)
+    }
     if (currentUser != null) {
+        const data = await getUserData(currentUser)
         modalHeader.value = 'Login Success';
         modalContent.value = `Welcome ${currentUser.us_username}`;
         isOpen.value = true;

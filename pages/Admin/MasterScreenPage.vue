@@ -11,7 +11,7 @@
 						class="p-2 bg-Primary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer text-white rounded">
 						Set BGM
 					</button>
-					<button @click="toggleModal(modalSetReminder)"
+					<button @click="toggleModalReminder"
 						class="p-2 bg-Primary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer text-white rounded">
 						Set Reminder
 					</button>
@@ -77,108 +77,10 @@
 					class="rounded bg-Primary text-center cursor-pointer px-6 py-2 text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-300">
 					Ganti Data Screen
 				</div>
-				<div @click="toggleModalEdit(modalChangeTemplate)"
-					class="rounded bg-Primary text-center cursor-pointer px-6 py-2 text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-300">
-					Ganti Template
-				</div>
 			</div>
 		</div>
 	</div>
-	<!-- MODAL GANTI TEMPLATE -->
-	<div ref="modalChangeTemplate"
-		class="hidden overflow-x-hidden flex fixed top-0 right-0 left-0 z-10 justify-center items-center h-screen bg-black bg-opacity-50">
-		<div class="p-4 w-full max-w-2xl relative bg-white rounded-lg shadow sm:p-5 flex flex-col space-y-2">
-			<div class="flex gap-1 justify-between items-center pb-4 rounded-t border-b">
-				<h3 class="text-lg font-semibold text-OnPrimaryContainer">Ganti Template</h3>
-				<svg @click="toggleModalEdit(modalChangeTemplate)" xmlns="http://www.w3.org/2000/svg"
-					class="h-6 w-6 hover:cursor-pointer hover:bg-Primary hover:duration-500 hover:rounded-lg"
-					fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-				</svg>
-			</div>
-			<div class="flex flex-col space-y-2 max-h-[70vh] overflow-auto">
-				<div class="flex space-x-2">
-					<!-- TEMPLATE 1 -->
-					<div class="rounded w-full h-[300px] bg-Primary flex flex-col">
-						<div class="bg-black bg-opacity-40 h-full">
-							<marquee class="text-OnPrimary h-[10%] bg-Primary flex items-center">
-								Digital Signage ISTTS
-							</marquee>
-							<div class="h-[80%] flex justify-center items-center text-4xl text-white">CONTENT</div>
-							<marquee class="bg-OnPrimaryContainer h-[10%] flex">
-								<div class="flex items-center">
-									<div class="text-PrimaryContainer">Digital Signage ISTTS</div>
-									<img src="/LogoISTTS.png" alt="" class="h-[30px]" />
-								</div>
-							</marquee>
-						</div>
-					</div>
-					<input v-model="screenTemplate" type="radio" name="template" id="template" value="template1" />
-				</div>
-				<div class="flex space-x-2">
-					<!-- TEMPLATE 2 -->
-					<div class="rounded w-full h-[300px] bg-Primary flex flex-col">
-						<div class="bg-black bg-opacity-40 h-full">
-							<marquee class="text-OnPrimary h-[10%] bg-Primary flex items-center">
-								Digital Signage ISTTS
-							</marquee>
-							<div class="h-[80%] w-full flex justify-center items-center text-4xl text-white">
-								<div class="flex flex-col h-full w-1/3 overflow-hidden shadow-lg">
-									<!-- Weather UI -->
-									<div
-										class="h-1/2 bg-gradient-to-br from-OnPrimaryContainer to-Primary flex flex-col items-center justify-center text-base text-center">
-										Informasi Cuaca dan Jam
-									</div>
-									<!-- Reminder -->
-									<div class="h-1/2 bg-black flex flex-col justify-center items-center bg-opacity-60">
-										<div class="text-white p-1 text-base">Reminder</div>
-									</div>
-								</div>
 
-								<div class="flex h-full justify-center items-center w-2/3 bg-black bg-opacity-10">
-									Content
-								</div>
-							</div>
-							<marquee class="bg-OnPrimaryContainer h-[10%] flex">
-								<div class="flex items-center">
-									<div class="text-PrimaryContainer">Digital Signage ISTTS</div>
-									<img src="/LogoISTTS.png" alt="" class="h-[30px]" />
-								</div>
-							</marquee>
-						</div>
-					</div>
-					<input v-model="screenTemplate" type="radio" name="template" id="template" value="template2" />
-				</div>
-				<div class="flex space-x-2 justify-between">
-					<!-- TEMPLATE 3 -->
-					<div class="rounded w-[60%] h-[700px] bg-Primary flex flex-col">
-						<div class="bg-black bg-opacity-40 h-full">
-							<marquee class="text-OnPrimary h-[6%] bg-Primary flex items-center">
-								Digital Signage ISTTS
-							</marquee>
-							<div
-								class="h-[44%] bg-black bg-opacity-30 flex justify-center items-center text-4xl text-white">
-								CONTENT 1
-							</div>
-							<div class="h-[44%] flex justify-center items-center text-4xl text-white">CONTENT 2</div>
-							<marquee class="bg-OnPrimaryContainer h-[6%] flex">
-								<div class="flex items-center">
-									<div class="text-PrimaryContainer">Digital Signage ISTTS</div>
-									<img src="/LogoISTTS.png" alt="" class="h-[30px]" />
-								</div>
-							</marquee>
-						</div>
-					</div>
-					<input v-model="screenTemplate" type="radio" name="template" id="template" value="template3" />
-				</div>
-			</div>
-
-			<button @click="changeTemplate"
-				class="w-full bg-Primary text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-300 rounded py-2">
-				Ganti Template
-			</button>
-		</div>
-	</div>
 	<!-- MODAL TAMBAH SCREEN -->
 	<div ref="modalAddScreen"
 		class="hidden overflow-x-hidden flex fixed top-0 right-0 left-0 z-10 justify-center items-center h-screen bg-black bg-opacity-50">
@@ -224,8 +126,8 @@
 		</div>
 	</div>
 	<!-- MODAL SET REMINDER -->
-	<div ref="modalSetReminder"
-		class="hidden overflow-x-hidden flex fixed top-0 right-0 left-0 z-10 justify-center items-center h-screen bg-black bg-opacity-50">
+	<div v-if="modalSetReminder"
+		class="overflow-x-hidden flex fixed top-0 right-0 left-0 z-10 justify-center items-center h-screen bg-black bg-opacity-50">
 		<div class="p-4 w-full max-w-6xl h-5/6 relative bg-white rounded-lg shadow sm:p-5 flex flex-col space-y-2">
 			<div class="flex justify-between items-center pb-4 rounded-t border-b">
 				<h3 class="text-lg font-semibold text-OnPrimaryContainer">List Reminder</h3>
@@ -251,10 +153,12 @@
 			<div class="flex-col flex-grow space-y-1 overflow-auto p-4 rounded">
 				<!-- Dropdown with IP List -->
 				<div>Select Screen</div>
-				<select class="w-full rounded py-2 border mb-4" v-model="reminderScreenIp" @change="reminderData">
-					<option v-for="ip in listReminder" :value="ip.socket_ip" class="text-onPrimary">{{
-						ip.socket_ip + " - " + ScreenDetail(ip.socket_ip).sc_name + " - " +
-						ScreenDetail(ip.socket_ip).sc_location }}
+				<select v-if="listReminder != null && listReminder.length > 0" class="w-full rounded py-2 border mb-4"
+					v-model="reminderScreenIp" @change="reminderData">
+					<option v-for="ip in listReminder.filter((item) => item.socket_ip != '')" :value="ip.socket_ip"
+						class="text-onPrimary">{{
+							ip.socket_ip + " - " + ScreenDetail(ip.socket_ip).sc_name + " - " +
+							ScreenDetail(ip.socket_ip).sc_location }}
 					</option>
 				</select>
 
@@ -389,7 +293,8 @@
 			<div class="flex flex-wrap flex-grow overflow-auto items-center justify-center">
 				<div v-for="screen in listScreen.filter((screen) => statusText(screen.sc_ip) == 'Online')"
 					class="h-[260px] w-[260px] rounded mx-1 space-y-1">
-					<div class="h-[225px] w-[260px] rounded flex flex-col items-center justify-center cursor-pointer hover:shadow-2xl hover:bg-OnPrimaryContainer text-OnPrimary"
+					<div v-if="screen != null"
+						class="h-[225px] w-[260px] rounded flex flex-col items-center justify-center cursor-pointer hover:shadow-2xl hover:bg-OnPrimaryContainer text-OnPrimary"
 						:class="selectedScreen[screen.sc_id] ? 'bg-OnPrimaryContainer' : 'bg-Primary'"
 						@click="toggleSelectScreen(screen)">
 						<img src="\Monitor.png" alt="" />
@@ -456,18 +361,29 @@
 	</div>
 	<NotificationModal :modal-header="modalHeader" :modal-content="modalContent" :is-open="isOpen"
 		:button-function="closeNotif" />
+	<Loading :loading="loading" message="Loading..."></Loading>
 </template>
 
 <script setup>
-import { da } from "date-fns/locale";
+const loading = ref(false)
 import { io } from "socket.io-client"
-
+const { getUserData } = useUser()
 const { getPlaylist } = usePlaylist()
 const { getCLient, getMusicClient, getReminderClient } = useSocket()
 const { createScreen, deleteScreen, getScreen, updateScreen } = useScreen()
 const listScreen = ref(await getScreen())
 const isHoveredCurrentMusic = ref({})
+const currentUser = ref(null)
 onBeforeMount(async () => {
+	const router = useRouter()
+	const token = sessionStorage.getItem("currentUser")
+	currentUser.value = await getUserData(token)
+	if (currentUser.value == null) {
+		router.push("/")
+	}
+	else if (currentUser.value.role.role_name !== "Admin") {
+		router.push("/Biro/ListAnnouncementPage")
+	}
 	for (let i = 0; i < listScreen.value.length; i++) {
 		isHoveredCurrentMusic.value[listScreen.value[i].sc_id] = false
 	}
@@ -487,7 +403,7 @@ const router = useRouter()
 // MODAL DECLARATION
 const modalAddScreen = ref(null)
 const modalScreen = ref(null)
-const modalSetReminder = ref(null)
+const modalSetReminder = ref(false)
 const modalEditScreen = ref(null)
 const modalChangeTemplate = ref(null)
 const modalSetBGM = ref(null)
@@ -561,7 +477,6 @@ const statusClass = (sc_ip) => {
 }
 const listMusic = ref(await getMusicClient())
 const musicTitle = (sc_ip) => {
-	console.log(listMusic.value)
 	const music = listMusic.value.find((music) => music.socket_ip === sc_ip)
 	if (music) {
 		return music.title
@@ -573,16 +488,6 @@ console.log("CLIENT:", listReminder.value)
 const host = "http://localhost:3000"
 const socket = io(host, {
 	path: "/api/socket.io",
-})
-onBeforeMount(async () => {
-	currentUser.value = JSON.parse(sessionStorage.getItem("currentUser"))
-	const router = useRouter()
-	if (currentUser.value == null) {
-		router.push("/")
-	}
-	else if (currentUser.value.us_role != "admin") {
-		router.push("/Biro/ListAnnouncementPage")
-	}
 })
 onMounted(async () => {
 	const tag = document.createElement("script")
@@ -674,14 +579,18 @@ const toggleModal = (modal, screen) => {
 		screenIP.value = ""
 	} else {
 		currentScreen.value = screen
+		screenName.value = currentScreen.value.sc_name
+		screenLocation.value = currentScreen.value.sc_location
+		screenIP.value = currentScreen.value.sc_ip
 	}
 }
 const toggleModalReminder = () => {
-	modalSetReminder.value.classList.toggle("hidden")
-	if (modalSetReminder.value.classList.contains("hidden")) {
+	if (modalSetReminder.value == true) {
 		reminderScreenIp.value = ''
 		tempReminder.value = null
 	}
+	modalSetReminder.value = !modalSetReminder.value
+
 }
 const toggleModalEdit = (modal) => {
 	modal.classList.toggle("hidden")
@@ -809,6 +718,7 @@ const addNewReminder = () => {
 const openModalSaveReminder = () => {
 	if (tempReminder.value == null || reminderScreenIp.value == '') {
 		openNotif("Error", "Reminder kosong/belum memilih screen")
+		console.log(tempReminder.value)
 	}
 	else {
 		modalSaveReminder.value = true

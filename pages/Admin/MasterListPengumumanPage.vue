@@ -8,7 +8,7 @@
 				<div class="text-Primary font-bold text-2xl">Daftar List Pengumuman</div>
 				<div class="flex">
 					<div class="relative">
-						<input type="text" placeholder="Search..."
+						<input v-model="searchedList" type="text" placeholder="Search..."
 							class="block w-full py-2 pl-10 pr-4 leading-tight bg-white border border-gray-300 rounded focus:outline-none focus:bg-white focus:border-gray-500" />
 						<div class="absolute inset-y-0 left-0 flex items-center pl-3">
 							<svg class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -25,7 +25,7 @@
 			<div class="border-b-2 border-Primary mt-1"></div>
 			<div class="flex-grow flex-col p-1 space-y-1">
 				<!-- List - List Pengumuman -->
-				<div v-for="(data, index) in dataListAnnouncement"
+				<div v-for="(data, index) in dataListAnnouncement.filter((item) => item.la_title.toLowerCase().includes(searchedList.toLowerCase()))"
 					class="h-[100px] w-full rounded shadow-xl flex items-center justify-between space-x-3 px-2">
 					<div class="flex items-center space-x-3 justify-between w-full">
 						<!-- <div class="w-[100px] h-[100px] bg-PrimaryContainer rounded-l">
@@ -48,7 +48,7 @@
 	<div ref="modalShowListPengumuman"
 		class="hidden overflow-x-hidden flex fixed top-0 right-0 left-0 z-10 justify-center items-center h-screen bg-black bg-opacity-50">
 		<div
-			class="p-4 w-3/4 max-w-6xl h-[calc(100vh-20px)] relative bg-white rounded-lg shadow sm:p-5 flex flex-col space-y-2">
+			class="p-4 w-3/4 max-w-6xl h-[calc(100vh-20px)] relative bg-white rounded-lg shadow sm:p-5 flex flex-col space-y-2 overflow-hidden">
 			<div class="flex justify-between items-center pb-4 rounded-t border-b">
 				<h3 class="text-lg font-semibold text-OnPrimaryContainer">List Pengumuman</h3>
 				<svg @click="toggleModal(modalShowListPengumuman)" xmlns="http://www.w3.org/2000/svg"
@@ -57,45 +57,43 @@
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
 				</svg>
 			</div>
-			<form @submit.prevent="tambahListPengumuman" class="flex-col flex-grow space-y-2 overflow-auto">
-				<div class="max-h-full">
-					<div v-if="dataAnnouncementInList != null"
-						v-for="(data, index) in dataAnnouncementInList.announcement_in_list"
-						class="h-[100px] w-full rounded shadow-xl hover:bg-slate-50 flex items-center justify-between space-x-3">
-						<div class="flex justify-between items-center w-full space-x-3">
-							<div class="font-bold text-lg m-1 w-full">{{ data.announcement.an_title }}</div>
-							<div class="w-fit flex justify-end space-x-4">
-								<button type="button" v-if="data.announcement.an_url.includes('sim.stts')"
-									class="rounded bg-Primary text-OnPrimary text-center px-3 py-1"
-									@click="openModalQr(data.announcement.an_url)">
-									Detail
-								</button>
-								<button type="button" v-else-if="data.announcement.an_url.includes('drive.google')"
-									class="rounded bg-Primary text-OnPrimary text-center px-3 py-1"
-									@click="openModalKegiatan(data.announcement.an_url)">
-									Detail
-								</button>
-								<button type="button" v-else
-									class="rounded bg-Primary text-OnPrimary text-center px-3 py-1"
-									@click="openModalLowongan({ link: data.announcement.an_url })">
-									Detail
-								</button>
-								<div @click="toggleSelection(data)"
-									class="relative w-14 h-8 rounded-full p-1 border-OnPrimaryContainer border-2 flex items-center bg-slate-200 cursor-pointer">
-									<input type="checkbox" v-on:click="toggleSelection(data)"
-										:checked="isSelected(data)"
-										class="absolute w-6 h-6 rounded-full appearance-none bg-white border-none checked:right-0 checked:left-6 transition-transform duration-1000 checked:bg-green-400"
-										disabled />
-								</div>
-							</div>
+			<div class="h-[100px] w-full rounded shadow-xl flex items-center justify-between space-x-3 px-2"
+				v-if="dataAnnouncementInList != null">
+				<div class="font-bold text-lg m-1">
+					{{ dataAnnouncementInList.announcement_in_list[currentIndex].announcement.an_title }}
+				</div>
+			</div>
+			<!-- Image Slider -->
+			<div class="relative flex items-center justify-center flex-grow overflow-auto">
+				<div class="overflow-hidden w-2/3 h-full">
+					<div class="flex h-full transition-transform duration-500 ease-in-out"
+						:style="{ transform: `translateX(-${currentIndex * 100}%)` }">
+						<!-- Loop through images -->
+						<div v-if="dataAnnouncementInList != null"
+							v-for="(data, index) in dataAnnouncementInList.announcement_in_list" :key="index"
+							class="flex-shrink-0 w-full h-full flex justify-center items-center">
+							<img v-if="data.announcement.an_type == 'image'" :src="data.announcement.an_url"
+								alt="Announcement Image"
+								class="max-w-full max-h-full object-contain rounded-lg shadow-xl" />
+							<video v-else class="max-w-full max-h-full object-contain rounded-lg shadow-xl" controls
+								:src="data.announcement.an_url"></video>
 						</div>
 					</div>
 				</div>
-			</form>
-			<button
-				class="rounded bg-Primary text-center cursor-pointer px-6 py-2 text-OnPrimary hover:bg-PrimaryContainer hover:text-OnPrimaryContainer hover:duration-300">
-				Tambahkan
-			</button>
+
+				<!-- Navigation Controls -->
+				<button v-if="currentIndex > 0" @click="prevSlide"
+					class="absolute top-1/2 transform -translate-y-1/2 left-0 bg-Primary text-OnPrimary p-2 rounded-full hover:bg-OnPrimaryContainer">
+					Prev
+				</button>
+				<button v-if="
+					dataAnnouncementInList != null &&
+					currentIndex < dataAnnouncementInList.announcement_in_list.length - 1
+				" @click="nextSlide"
+					class="absolute top-1/2 transform -translate-y-1/2 right-0 bg-Primary text-OnPrimary p-2 rounded-full hover:bg-OnPrimaryContainer">
+					Next
+				</button>
+			</div>
 		</div>
 	</div>
 	<!-- Modal add list pengumuman -->
@@ -257,11 +255,16 @@
 		:closeModal="closeModal" />
 	<NotificationModal :modalHeader="modalHeader" :modalContent="modalContent" :buttonFunction="buttonNotification"
 		:isOpen="isOpen" />
+	<Loading :loading="onLoading" :message="loadingMessage" />
 </template>
 
 <script setup>
+const searchedList = ref("")
+const onLoading = ref(false)
+const loadingMessage = ref("")
+const currentIndex = ref(0)
 const { getLaporanBAK, getPengumuman, getLowongan } = useDataISTTS()
-
+const { getUserData } = useUser()
 const { getAllCategory } = useCategory()
 const { getListAnnouncement, addListAnnouncement, deleteListAnnouncement, getAnnouncement } = useAnnouncement()
 const modalHeader = ref("")
@@ -297,12 +300,13 @@ const imageUrl = ref(null)
 const selectedItems = ref([])
 const kontenType = ref("")
 onBeforeMount(async () => {
-	currentUser.value = JSON.parse(sessionStorage.getItem("currentUser"))
 	const router = useRouter()
+	const token = sessionStorage.getItem("currentUser")
+	currentUser.value = await getUserData(token)
 	if (currentUser.value == null) {
 		router.push("/")
 	}
-	else if (currentUser.value.us_role != "admin") {
+	else if (currentUser.value.role.role_name !== "Admin") {
 		router.push("/Biro/ListAnnouncementPage")
 	}
 })
@@ -318,6 +322,7 @@ const toggleModalShowListPengumuman = (modal, data) => {
 	}
 }
 const toggleModal = (modal) => {
+	currentIndex.value = 0
 	modal.classList.toggle("hidden")
 }
 const openModalQr = (pdfUrl) => {

@@ -1,35 +1,7 @@
 <template>
-  <div class="p-4 h-screen flex flex-col space-y-2">
-    <!-- Input Section -->
-    <div class="flex items-center space-x-2">
-      <input
-        type="text"
-        class="border-gray-400 border rounded p-2"
-        placeholder="URL FILE"
-        @change="onUrlChange"
-      />
-      <input
-        type="file"
-        @change="onFileChange"
-        class="border-gray-400 border rounded p-2"
-      />
-    </div>
+  <img src="https://drive.google.com/thumbnail?id=0B6wwyazyzml-OGQ3VUo0Z2thdmc&sz=w1000
+" alt="Google Drive Image">
 
-    <div class="flex flex-grow">
-      <div
-        ref="canvasDivRef"
-        class="w-[50%] h-full flex flex-col items-center overflow-auto"
-      >
-        <canvas ref="leftCanvasRef" class="border border-black rounded"></canvas>
-      </div>
-      <div class="w-[50%] h-full flex flex-col items-center overflow-auto">
-        <canvas ref="rightCanvasRef" class="border border-black rounded"></canvas>
-      </div>
-    </div>
-    
-    <button @click="copySelectedText">Copy Selected Text</button>
-    <button @click="pasteTextToLeftCanvas">Paste to Left Canvas</button>
-  </div>
 </template>
 <script setup>
 import { ref, nextTick } from 'vue';
@@ -146,65 +118,65 @@ const copySelectedText = () => {
 
 // Paste copied text to the left canvas and change it to single text box
 const pasteTextToLeftCanvas = () => {
-    if (copiedObjects.length === 0) return;
+  if (copiedObjects.length === 0) return;
 
-    // Calculate the combined position and text
-    let combinedText = '';
-    let minLeft = Infinity;
-    let minTop = Infinity;
-    let leftBefore = 0;
-    let topBefore = 0;
-    copiedObjects.forEach((obj) => {
-      const bbox = obj.getBoundingRect(); // Get bounding box of each text object
-      console.log(bbox)
-      minLeft = Math.min(minLeft, bbox.left);
-      minTop = Math.min(minTop, bbox.top);
+  // Calculate the combined position and text
+  let combinedText = '';
+  let minLeft = Infinity;
+  let minTop = Infinity;
+  let leftBefore = 0;
+  let topBefore = 0;
+  copiedObjects.forEach((obj) => {
+    const bbox = obj.getBoundingRect(); // Get bounding box of each text object
+    console.log(bbox)
+    minLeft = Math.min(minLeft, bbox.left);
+    minTop = Math.min(minTop, bbox.top);
 
-// index.vue?t=1725618140569:149 {left: -97.81641468682503, top: 5.109953203743685, width: 6.77001953125, height: 15.689999999999998}
-// index.vue?t=1725618140569:149 {left: -86.74466042716581, top: 2.5872750179985635, width: 37.83544921875, height: 15.689999999999998}
-// index.vue?t=1725618140569:149 {left: -49.885529157667364, top: 3.1478701703863683, width: 45.77001953125, height: 15.689999999999998}
-// index.vue?t=1725618140569:149 {left: -1.5341972642188466, top: 4.969804415646734, width: 11.8291015625, height: 15.689999999999998}
-// index.vue?t=1725618140569:149 {left: 11.219342452603826, top: 2.5872750179985635, width: 42.869140625, height: 15.689999999999998}
-// index.vue?t=1725618140569:149 {left: 56.767698584113305, top: 2.867572594192466, width: 38.29248046875, height: 15.689999999999998}
-// index.vue?t=1725618140569:149 {left: 95.58891288696907, top: 3.1478701703863683, width: 14, height: 15.689999999999998}
-// index.vue?t=1725618140569:149 {left: -86.88480921526276, top: 16.321856251499867, width: 19.3251953125, height: 17.949999999999996}
-// index.vue?t=1725618140569:149 {left: -67.82457403407726, top: 18.14379049676026, width: 58.7587890625, height: 17.949999999999996}
-      if(topBefore == 0 && leftBefore == 0){
-        combinedText += obj.text;
-      }
-      else if(difference(minLeft,bbox.left) < 12){
-        combinedText += '\n' + obj.text;
-      }
-      else{
-        combinedText += ' ' + obj.text;
-      }
-      leftBefore = bbox.left;
-      topBefore = bbox.top;
-      
-      
-    });
-    console.log(combinedText)
-    // Create a new Textbox with the combined text
-    const combinedTextBox = new fabric.Textbox(combinedText, {
-      left: 0,
-      top: 0,
-      fontSize: 12,
-      fill: 'black',
-      selectable: true, // Allow the combined text to be selected
-      backgroundColor: 'rgba(255, 255, 255, 0.5)',
-      width: fabricCanvasLeft.width-40, // Adjust width based on canvas size
-    });
+    // index.vue?t=1725618140569:149 {left: -97.81641468682503, top: 5.109953203743685, width: 6.77001953125, height: 15.689999999999998}
+    // index.vue?t=1725618140569:149 {left: -86.74466042716581, top: 2.5872750179985635, width: 37.83544921875, height: 15.689999999999998}
+    // index.vue?t=1725618140569:149 {left: -49.885529157667364, top: 3.1478701703863683, width: 45.77001953125, height: 15.689999999999998}
+    // index.vue?t=1725618140569:149 {left: -1.5341972642188466, top: 4.969804415646734, width: 11.8291015625, height: 15.689999999999998}
+    // index.vue?t=1725618140569:149 {left: 11.219342452603826, top: 2.5872750179985635, width: 42.869140625, height: 15.689999999999998}
+    // index.vue?t=1725618140569:149 {left: 56.767698584113305, top: 2.867572594192466, width: 38.29248046875, height: 15.689999999999998}
+    // index.vue?t=1725618140569:149 {left: 95.58891288696907, top: 3.1478701703863683, width: 14, height: 15.689999999999998}
+    // index.vue?t=1725618140569:149 {left: -86.88480921526276, top: 16.321856251499867, width: 19.3251953125, height: 17.949999999999996}
+    // index.vue?t=1725618140569:149 {left: -67.82457403407726, top: 18.14379049676026, width: 58.7587890625, height: 17.949999999999996}
+    if (topBefore == 0 && leftBefore == 0) {
+      combinedText += obj.text;
+    }
+    else if (difference(minLeft, bbox.left) < 12) {
+      combinedText += '\n' + obj.text;
+    }
+    else {
+      combinedText += ' ' + obj.text;
+    }
+    leftBefore = bbox.left;
+    topBefore = bbox.top;
 
-    // Add the new Textbox to the left canvas
-    fabricCanvasLeft.add(combinedTextBox);
-    fabricCanvasLeft.renderAll();
+
+  });
+  console.log(combinedText)
+  // Create a new Textbox with the combined text
+  const combinedTextBox = new fabric.Textbox(combinedText, {
+    left: 0,
+    top: 0,
+    fontSize: 12,
+    fill: 'black',
+    selectable: true, // Allow the combined text to be selected
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    width: fabricCanvasLeft.width - 40, // Adjust width based on canvas size
+  });
+
+  // Add the new Textbox to the left canvas
+  fabricCanvasLeft.add(combinedTextBox);
+  fabricCanvasLeft.renderAll();
 };
 const difference = (a, b) => {
-  if(a>b){
-    return a-b;
+  if (a > b) {
+    return a - b;
   }
-  else{
-    return b-a;
+  else {
+    return b - a;
   }
 }
 </script>
