@@ -162,3 +162,7 @@ ALTER TABLE `Announcement` ADD CONSTRAINT `Announcement_an_cat_id_fkey` FOREIGN 
 INSERT INTO `Role` (`role_id`, `role_name`) VALUES ('AdminDigitalSignage', 'Admin');
 -- InsertUserData
 INSERT INTO `User` (`us_username`, `us_password`, `us_role_id`) VALUES ('admin', 'admin', 'AdminDigitalSignage');
+INSERT INTO `Category` (`cat_id`,`cat_name`, `cat_qty`, `cat_duration`) VALUES (1,'Pengumuman Kampus', 1, 1);
+INSERT INTO `Category` (`cat_id`,`cat_name`, `cat_qty`, `cat_duration`) VALUES (2,'Lowongan Magang', 1, 1);
+INSERT INTO `Category` (`cat_id`,`cat_name`, `cat_qty`, `cat_duration`) VALUES (3,'Lowongan Kerja', 1, 1);
+INSERT INTO `Category` (`cat_id`,`cat_name`, `cat_qty`, `cat_duration`) VALUES (4,'Pengumuman Kegiatan', 1, 1);

@@ -38,6 +38,8 @@
 							<img src="/icon_detail.png"
 								@click="toggleModalShowListPengumuman(modalShowListPengumuman, data)"
 								class="w-[50px] h-[50px] hover:bg-slate-200 rounded hover:duration-300" />
+							<img @click="hapusListPengumuman(data)" src="/icon-delete.png"
+								class="w-[50px] h-[50px] hover:bg-slate-200 rounded hover:duration-300" />
 						</div>
 					</div>
 				</div>
@@ -424,16 +426,17 @@ const tambahListPengumuman = async () => {
 		currentUser: currentUser.value.us_username,
 		announcements: dataItem,
 	}
-
-	addListAnnouncement(data)
-		.then((result) => {
-			openNotif("Berhasil", result.body.message)
-		})
-		.catch((err) => {
-			openNotif("Error", err.response.data.message)
-		})
+	setLoadingState(true, "Menambahkan List Pengumuman")
+	const result = await addListAnnouncement(data)
+	setLoadingState(false)
+	if (result.statusCode == 200) {
+		openNotif("Berhasil", result.body.message)
+	} else {
+		openNotif("Error", result.body.message)
+	}
 }
 const hapusListPengumuman = async (data) => {
+	setLoadingState(true, "Menghapus List Pengumuman")
 	const result = await deleteListAnnouncement(data)
 	console.log(result)
 	if (result.status == 200) {
@@ -457,6 +460,11 @@ const prevSlide = () => {
 const convertDate = (date) => {
 	const options = { year: "numeric", month: "long", day: "numeric" }
 	return new Date(date).toLocaleDateString("id-ID", options)
+}
+// LOADING STATE
+const setLoadingState = (isLoading, message = "") => {
+	onLoading.value = isLoading
+	loadingMessage.value = message
 }
 </script>
 <style>

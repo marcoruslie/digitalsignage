@@ -737,6 +737,7 @@ const saveReminder = (data) => {
 			reminder: tempReminder.value,
 		})
 	}
+	openNotif("Success", "Reminder Berhasil Disimpan")
 }
 </script>
 <style>

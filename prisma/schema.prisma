@@ -89,7 +89,7 @@ model List_in_Playlist{
   lp_pl_id String
   lp_la_id String
   playlist Playlist @relation(fields: [lp_pl_id], references: [pl_id],onDelete: Cascade)
-  listannouncement List_Announcement @relation(fields: [lp_la_id], references: [la_id])
+  listannouncement List_Announcement @relation(fields: [lp_la_id], references: [la_id], onDelete: Cascade)
   createdAt DateTime @default(now())
   deletedAt DateTime?
 }
@@ -98,7 +98,7 @@ model Announcement_in_List{
   ail_id String @id @default(uuid())
   ail_an_id String
   ail_la_id String
-  announcement Announcement @relation(fields: [ail_an_id], references: [an_id])
+  announcement Announcement @relation(fields: [ail_an_id], references: [an_id],onDelete: Cascade)
   listannouncement List_Announcement @relation(fields: [ail_la_id], references: [la_id], onDelete: Cascade)
   createdAt DateTime @default(now())
   deletedAt DateTime?
