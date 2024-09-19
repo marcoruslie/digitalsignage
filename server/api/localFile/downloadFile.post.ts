@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
       id = idContent;
     }
     const response = await fetch(fileUrl);
-
+    console.log(response);
     if (!response.ok) {
       throw new Error("Failed to download file");
     }
