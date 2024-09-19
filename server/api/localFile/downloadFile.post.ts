@@ -37,14 +37,21 @@ export default defineEventHandler(async (event) => {
     const filePath = join(resourcesDir, compressedFileName);
 
     if (compressType === "image") {
-      await sharp(buffer)
-        .resize(1200, 800, { fit: "inside" }) // Resize carefully, if needed
-        .toFormat(sharpFormat, {
-          quality: 100, // Maximum quality
-          progressive: true, // Enable progressive rendering for JPEG
-          chromaSubsampling: "4:4:4", // Prevent color subsampling (for JPEG)
-        })
-        .toFile(filePath);
+      try {
+        await sharp(buffer)
+          .resize(1200, 800, { fit: "inside" }) // Resize carefully, if needed
+          .toFormat(sharpFormat, {
+            quality: 100, // Maximum quality
+            progressive: true, // Enable progressive rendering for JPEG
+            chromaSubsampling: "4:4:4", // Prevent color subsampling (for JPEG)
+          })
+          .toFile(filePath);
+      } catch (error) {
+        throw createError({
+          statusCode: 500,
+          statusMessage: error.message,
+        });
+      }
     }
     const editedFile = join("/_nuxt/resources", kategori, compressedFileName);
     return {
