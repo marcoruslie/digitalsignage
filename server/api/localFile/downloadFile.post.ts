@@ -4,6 +4,8 @@ import sharp from "sharp";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
+
+  console.log(body);
   const fileUrl = body.url;
   const compressType = body.type || "image";
   const kategori = body.kategori;
@@ -23,7 +25,6 @@ export default defineEventHandler(async (event) => {
       id = idContent;
     }
     const response = await fetch(fileUrl);
-    console.log(response);
     if (!response.ok) {
       throw new Error("Failed to download file");
     }
