@@ -1,11 +1,11 @@
 -- DropForeignKey
-ALTER TABLE `category_for_user` DROP FOREIGN KEY `Category_For_User_cu_cat_id_fkey`;
+ALTER TABLE `Category_For_User` DROP FOREIGN KEY `Category_For_User_cu_cat_id_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `category_for_user` DROP FOREIGN KEY `Category_For_User_cu_role_id_fkey`;
+ALTER TABLE `Category_For_User` DROP FOREIGN KEY `Category_For_User_cu_role_id_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `list_announcement` DROP FOREIGN KEY `List_Announcement_la_us_username_fkey`;
+ALTER TABLE `List_Announcement` DROP FOREIGN KEY `List_Announcement_la_us_username_fkey`;
 
 -- AddForeignKey
 ALTER TABLE `Category_For_User` ADD CONSTRAINT `Category_For_User_cu_role_id_fkey` FOREIGN KEY (`cu_role_id`) REFERENCES `Role`(`role_id`) ON DELETE CASCADE ON UPDATE CASCADE;
