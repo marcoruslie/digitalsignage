@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
       } catch (error) {
         throw createError({
           statusCode: 500,
-          statusMessage: error.message,
+          statusMessage: "DEPENDECY_ERROR",
         });
       }
     }
@@ -61,7 +61,7 @@ export default defineEventHandler(async (event) => {
   } catch (error) {
     throw createError({
       statusCode: 500,
-      statusMessage: error.message,
+      statusMessage: "Failed to download and compress the file",
     });
   }
 });
