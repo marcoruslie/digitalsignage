@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
     } else {
       id = idContent;
     }
-    console.log("TES1");
+    console.log("TES1", fileUrl);
     const response = await fetch(fileUrl);
     console.log("TES2");
     if (!response.ok) {
