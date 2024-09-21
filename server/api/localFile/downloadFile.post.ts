@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
     }
     console.log("TES1", fileUrl);
     try {
-      await fetch(fileUrl);
+      console.log(await fetch(fileUrl));
     } catch (error) {
       console.log("ERROR", error);
     }
