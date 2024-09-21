@@ -24,8 +24,10 @@ export default defineEventHandler(async (event) => {
       id = idContent;
     }
     console.log("TES1", fileUrl);
+    console.log("TES2", await fetch(fileUrl));
     const response = await fetch(fileUrl);
-    console.log("TES2");
+
+    console.log("TES3");
     if (!response.ok) {
       throw new Error("Failed to download file");
     }
