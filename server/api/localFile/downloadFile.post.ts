@@ -1,10 +1,10 @@
+import axios from "axios";
 import { promises as fs } from "fs";
 import { join } from "path";
 import sharp from "sharp";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-
   const fileUrl = body.url;
   const compressType = body.type || "image";
   const kategori = body.kategori;
@@ -25,17 +25,19 @@ export default defineEventHandler(async (event) => {
     }
     console.log("TES1", fileUrl);
     try {
-      console.log(await fetch(fileUrl));
+      console.log(await axios.get(fileUrl));
     } catch (error) {
       console.log("ERROR", error);
     }
-    const response = await fetch(fileUrl);
+    const response = await axios.get(fileUrl, {
+      responseType: "arraybuffer",
+    });
 
-    console.log("TES3");
-    if (!response.ok) {
+    console.log(response);
+    if (response.status === 404) {
       throw new Error("Failed to download file");
     }
-    const arrayBuffer = await response.arrayBuffer();
+    const arrayBuffer = await response.data;
     const buffer = Buffer.from(arrayBuffer);
     const resourcesDir = join(process.cwd(), "resources", kategori);
     await fs.mkdir(resourcesDir, { recursive: true });
@@ -66,10 +68,10 @@ export default defineEventHandler(async (event) => {
       message: "File downloaded and compressed successfully",
       filePath: editedFile,
     };
-  } catch (error) {
+  } catch (error: any) {
     throw createError({
       statusCode: 500,
-      statusMessage: "Failed to download and compress the file",
+      statusMessage: error.message,
     });
   }
 });
