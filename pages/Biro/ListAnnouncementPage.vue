@@ -458,6 +458,7 @@ const hapusListPengumuman = async (data) => {
 	const result = await deleteListAnnouncement(data)
 	console.log(result)
 	if (result.status == 200) {
+		setLoadingState(false)
 		openNotif("Berhasil", result.statusText)
 	} else {
 		openNotif("Error", result.statusText)
