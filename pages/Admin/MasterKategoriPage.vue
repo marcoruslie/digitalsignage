@@ -156,6 +156,7 @@
 const { addCategory, getAllCategory, editCategory, setActiveCategory } = useCategory()
 const { getRole, getUserData } = useUser()
 // MODAL NOTIFICATION VARIABLE
+const currentUser = ref(null)
 const modalHeader = ref("")
 const modalContent = ref("")
 const isOpen = ref(false)
