@@ -448,9 +448,6 @@ onBeforeMount(async () => {
 		router.push('/')
 	}
 })
-onMounted(async () => {
-	currentUser.value = JSON.parse(sessionStorage.getItem("currentUser"))
-})
 const setLoadingState = (isLoading, message = "") => {
 	onLoading.value = isLoading
 	loadingMessage.value = message
