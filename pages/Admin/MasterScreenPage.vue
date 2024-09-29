@@ -245,7 +245,6 @@
 		<div class="p-4 w-1/2 max-w-6xl h-3/6/6 relative bg-white rounded-lg shadow sm:p-5 flex flex-col space-y-2">
 			<div class="flex justify-between items-center pb-4 rounded-t border-b">
 				<h3 class="text-lg font-semibold text-OnPrimaryContainer">Select BGM</h3>
-				<h1>{{ currentVideoId }}</h1>
 				<svg @click="toggleModal(modalSetBGM)" xmlns="http://www.w3.org/2000/svg"
 					class="h-6 w-6 hover:cursor-pointer hover:bg-Primary hover:duration-500 hover:rounded-lg"
 					fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -268,6 +267,9 @@
 						{{ video.snippet.title }}
 					</li>
 				</ul>
+				<div v-if="currentVideoTitle != ''" class="border rounded flex w-full">
+					<div class="font-bold">SELECTED : {{ currentVideoTitle }}</div>
+				</div>
 				<div class="flex w-full items-center justify-center">
 					<div id="player" class=""></div>
 				</div>
@@ -436,6 +438,7 @@ const openNotif = (header, content) => {
 const searchQuery = ref("")
 const searchResults = ref([])
 const currentVideoId = ref("")
+const currentVideoTitle = ref("")
 let youtubePlayer
 const isDropdownOpen = ref([])
 const toggleDropDown = (idx) => {
@@ -538,6 +541,7 @@ onMounted(async () => {
 		console.log(response)
 	})
 })
+
 const toggleSelectPlaylist = (pl_id, date) => {
 	const playlist = {
 		pl_id: pl_id,
@@ -674,6 +678,7 @@ const searchVideos = async () => {
 }
 const selectVideo = (videoId) => {
 	currentVideoId.value = videoId
+	currentVideoTitle.value = searchResults.value.find((video) => video.id.videoId === videoId).snippet.title
 	if (youtubePlayer) {
 		youtubePlayer.loadVideoById(videoId)
 		youtubePlayer.setPlaybackQuality("tiny")
