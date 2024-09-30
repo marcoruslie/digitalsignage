@@ -784,7 +784,7 @@ function setPlaylistData(contentPosition, screen) {
 		item.announcement_in_list.forEach((list, index) => {
 			dataContent.push({
 				index,
-				url: list.announcement.an_url.replace("\\_nuxt", ""),
+				url: list.announcement.an_url.replace("/_nuxt", ""),
 				type: list.announcement.an_type,
 			})
 		})
