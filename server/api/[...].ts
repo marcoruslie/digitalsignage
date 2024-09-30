@@ -2,6 +2,7 @@ import { initSocket, io } from "~~/server/socket";
 import { createRouter, useBase } from "h3";
 import path from "path";
 import fs from "fs";
+import { de } from "date-fns/locale";
 let listSocket: any = [];
 let listMusicClient: any = [];
 let listReminderClient: any = [];
@@ -116,11 +117,9 @@ io.on("connection", async (socket) => {
         const fileUrl = ann.announcement.an_url;
 
         const deleteNuxt = fileUrl.replace("\\_nuxt\\", "");
-        const fullPath = path.join(
-          process.cwd(),
-          fileUrl.replace("\\_nuxt\\", "")
-        );
-        console.log(fullPath);
+        console.log("DELETE:", deleteNuxt);
+        const fullPath = path.join(process.cwd(), deleteNuxt);
+        console.log("FULLPATCH", fullPath);
         const passUrl = deleteNuxt.replace(/\\/g, "/");
         const data = fs.readFileSync(fullPath);
         const annData = {
