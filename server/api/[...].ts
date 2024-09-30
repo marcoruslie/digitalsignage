@@ -125,7 +125,7 @@ io.on("connection", async (socket) => {
         const annData = {
           an_id: ann.announcement.an_id,
           kategori: item.category.cat_name.replace(" ", ""),
-          fileUrl: passUrl,
+          fileUrl: "/" + passUrl,
           an_type: ann.announcement.an_type,
           an_fileName: ann.announcement.an_url.split("/").pop(),
           fileData: data.toString("base64"),
