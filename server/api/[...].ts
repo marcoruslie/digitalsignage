@@ -116,10 +116,10 @@ io.on("connection", async (socket) => {
       item.announcement_in_list.forEach(async (ann: any) => {
         const fileUrl = ann.announcement.an_url;
 
-        const deleteNuxt = fileUrl.replace("\\_nuxt\\", "");
+        const deleteNuxt = fileUrl.replace("/_nuxt/", "");
         console.log("DELETE:", deleteNuxt);
         const fullPath = path.join(process.cwd(), deleteNuxt);
-        console.log("FULLPATCH", fullPath);
+        console.log("FULLPATH", fullPath);
         const passUrl = deleteNuxt.replace(/\\/g, "/");
         const data = fs.readFileSync(fullPath);
         const annData = {
