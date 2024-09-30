@@ -127,7 +127,7 @@ io.on("connection", async (socket) => {
           kategori: item.category.cat_name.replace(" ", ""),
           fileUrl: passUrl,
           an_type: ann.announcement.an_type,
-          an_fileName: ann.announcement.an_url.split("\\").pop(),
+          an_fileName: ann.announcement.an_url.split("/").pop(),
           fileData: data.toString("base64"),
         };
         fileData.push(annData);
