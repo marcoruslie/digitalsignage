@@ -27,7 +27,7 @@
 				<!-- List - List Pengumuman -->
 				<div v-if="currentUser != null" v-for="(data, index) in dataListAnnouncement.filter(
 					(item) => item.la_us_username == currentUser.us_username && item.la_title.toLowerCase().includes(searchedList.toLowerCase())
-				)" class="h-[100px] w-full rounded shadow-xl flex items-center justify-between space-x-3 px-2">
+				)" class="h-[150px] w-full rounded shadow-xl flex items-center justify-between space-x-3 px-2">
 					<div class="flex items-center space-x-3 justify-between w-full">
 						<!-- <div class="w-[100px] h-[100px] bg-PrimaryContainer rounded-l">
                                 <img :src="data.pengumuman_namafile" alt="">
