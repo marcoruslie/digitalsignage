@@ -26,13 +26,34 @@
 			<div class="flex-grow flex-col p-1 space-y-1">
 				<!-- List - List Pengumuman -->
 				<div v-for="(data, index) in dataListAnnouncement.filter((item) => item.la_title.toLowerCase().includes(searchedList.toLowerCase()))"
-					class="h-[100px] w-full rounded shadow-xl flex items-center justify-between space-x-3 px-2">
+					class="h-[150px] w-full rounded shadow-xl flex items-center justify-between space-x-3 px-2">
 					<div class="flex items-center space-x-3 justify-between w-full">
 						<!-- <div class="w-[100px] h-[100px] bg-PrimaryContainer rounded-l">
                                 <img :src="data.pengumuman_namafile" alt="">
                             </div> -->
 						<div class="w-full">
 							<div class="font-bold text-lg m-1">{{ data.la_title }}</div>
+							<div class="text-base mx-1">Diposting : {{ data.la_us_username }}</div>
+							<div class="text-base mx-1">Kategori : {{ data.category.cat_name }}</div>
+							<div class="text-base mx-1">
+								{{
+									new Date(data.createdAt).toLocaleDateString("id-ID", {
+										day: "2-digit",
+										month: "long",
+										year: "numeric",
+									}) +
+									" | " +
+									new Date(data.createdAt).toLocaleTimeString("id-ID", {
+										hour: "2-digit",
+										minute: "2-digit",
+										hour12: false,
+										timeZone: "Asia/Jakarta",
+									}) +
+									" WIB"
+								}}
+							</div>
+							<div class="text-base mx-1">Durasi : {{ formatDuration(data.category.cat_duration *
+								data.announcement_in_list.length) }}</div>
 						</div>
 						<div class="w-full flex justify-end">
 							<img src="/icon_detail.png"

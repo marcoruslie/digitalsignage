@@ -34,7 +34,6 @@
                             </div> -->
 						<div class="w-full">
 							<div class="font-bold text-lg m-1">{{ data.la_title }}</div>
-							<div class="text-base mx-1">Diposting : {{ data.la_us_username }}</div>
 							<div class="text-base mx-1">Kategori : {{ data.category.cat_name }}</div>
 							<div class="text-base mx-1">
 								{{
