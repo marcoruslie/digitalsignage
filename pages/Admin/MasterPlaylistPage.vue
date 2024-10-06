@@ -28,11 +28,22 @@
 					class="h-[100px] w-full rounded shadow-xl hover:bg-slate-50 flex items-center justify-between space-x-3 px-2">
 					<div class="flex flex-col">
 						<div class="font-bold text-lg">{{ item.pl_name }}</div>
-						<div v-if="item.playlist_in_screen.length == 0" class="font-light"></div>
-						<div v-else class="font-light">
-							<div class="font-bold" v-for="screen in item.playlist_in_screen">
-								{{ screen.screen.sc_name + " - " + screen.screen.sc_location }}
-							</div>
+						<div class="text-base mx-1">
+							{{
+								new Date(item.createdAt).toLocaleDateString("id-ID", {
+									day: "2-digit",
+									month: "long",
+									year: "numeric",
+								}) +
+								" | " +
+								new Date(item.createdAt).toLocaleTimeString("id-ID", {
+									hour: "2-digit",
+									minute: "2-digit",
+									hour12: false,
+									timeZone: "Asia/Jakarta",
+								}) +
+								" WIB"
+							}}
 						</div>
 					</div>
 					<div class="flex items-center space-x-3">
