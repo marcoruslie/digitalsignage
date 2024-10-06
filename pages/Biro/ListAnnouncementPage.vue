@@ -33,18 +33,18 @@
                                 <img :src="data.pengumuman_namafile" alt="">
                             </div> -->
 						<div class="w-full">
-							<div class="font-bold text-lg m-1">{{ item.la_title }}</div>
-							<div class="text-base mx-1">Diposting : {{ item.la_us_username }}</div>
-							<div class="text-base mx-1">Kategori : {{ item.category.cat_name }}</div>
+							<div class="font-bold text-lg m-1">{{ data.la_title }}</div>
+							<div class="text-base mx-1">Diposting : {{ data.la_us_username }}</div>
+							<div class="text-base mx-1">Kategori : {{ data.category.cat_name }}</div>
 							<div class="text-base mx-1">
 								{{
-									new Date(item.createdAt).toLocaleDateString("id-ID", {
+									new Date(data.createdAt).toLocaleDateString("id-ID", {
 										day: "2-digit",
 										month: "long",
 										year: "numeric",
 									}) +
 									" | " +
-									new Date(item.createdAt).toLocaleTimeString("id-ID", {
+									new Date(data.createdAt).toLocaleTimeString("id-ID", {
 										hour: "2-digit",
 										minute: "2-digit",
 										hour12: false,
@@ -53,8 +53,8 @@
 									" WIB"
 								}}
 							</div>
-							<div class="text-base mx-1">Durasi : {{ formatDuration(item.category.cat_duration *
-								item.announcement_in_list.length) }}</div>
+							<div class="text-base mx-1">Durasi : {{ formatDuration(data.category.cat_duration *
+								data.announcement_in_list.length) }}</div>
 						</div>
 						<div class="w-full flex space-x-2 justify-end">
 							<img src="/icon_detail.png"
