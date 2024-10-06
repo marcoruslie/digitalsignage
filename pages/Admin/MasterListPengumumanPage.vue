@@ -466,7 +466,13 @@ const setLoadingState = (isLoading, message = "") => {
 	onLoading.value = isLoading
 	loadingMessage.value = message
 }
+function formatDuration(durationInSeconds) {
+	const minutes = Math.floor(durationInSeconds / 60)
+	const seconds = durationInSeconds % 60
+	return minutes > 0 ? `${minutes} Menit ${seconds} Detik` : `${seconds} Detik`
+}
 </script>
+
 <style>
 /* Scrollbar track */
 ::-webkit-scrollbar-track {
