@@ -1,7 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  devtools: { enabled: true },
-
+  devtools: { enabled: false },
+  // SET THE MAXIMUM SIZE OF THE REQUEST BODY
+  // https://nuxt.com/docs/guide/directory-structure/nuxt.config#runtimeconfig
+  runtimeConfig: {
+    bodyParser: {
+      sizeLimit: "400mb",
+    },
+  },
   // app:{
   //   head:{
   //     script:[{

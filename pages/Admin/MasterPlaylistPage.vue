@@ -797,6 +797,7 @@ function setPlaylistData(contentPosition, screen) {
 				index,
 				url: list.announcement.an_url.replace("/_nuxt", ""),
 				type: list.announcement.an_type,
+				title: list.announcement.an_title,
 			})
 		})
 		if (contentPosition == "") {
