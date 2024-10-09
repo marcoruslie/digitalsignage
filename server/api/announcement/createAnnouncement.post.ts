@@ -151,4 +151,10 @@ export default defineEventHandler(async (event) => {
       };
     }
   }
+  return {
+    statusCode: 400,
+    body: {
+      message: "Missing required fields",
+    },
+  };
 });
