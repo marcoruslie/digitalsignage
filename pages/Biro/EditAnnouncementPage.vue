@@ -693,22 +693,31 @@ const updateProgress = (progress) => {
 const previewUrl = ref(null)
 const isImage = ref(false)
 const isVideo = ref(false)
-function handleFileUpload(event) {
-	const file = event.target.files[0]
-	fileUpload.value = file
-	if (file) {
-		const fileType = file.type
-		if (fileType.startsWith("image/")) {
-			isImage.value = true
-			isVideo.value = false
-			previewUrl.value = URL.createObjectURL(file) // Create a preview URL for the image
-		} else if (fileType.startsWith("video/")) {
-			isImage.value = false
-			isVideo.value = true
-			previewUrl.value = URL.createObjectURL(file) // Create a preview URL for the video
-		} else {
-			resetPreview()
-			alert("Please select an image or video file.")
+async function handleFileUpload(event) {
+	// abort the file selection if the file size is over 100mb
+	if (event.target.files[0].size > 300000000) {
+		alert("File size is too large. Please select a file under 300MB.")
+		return
+	}
+	else {
+		const file = event.target.files[0]
+		fileUpload.value = file
+		if (file) {
+			const fileType = file.type
+			if (fileType.startsWith("image/")) {
+				isImage.value = true
+				isVideo.value = false
+				previewUrl.value = URL.createObjectURL(file) // Create a preview URL for the image
+			} else if (fileType.startsWith("video/")) {
+				isImage.value = false
+				isVideo.value = false
+				await setTimeout(() => { }, 1000)
+				isVideo.value = true
+				previewUrl.value = URL.createObjectURL(file) // Create a preview URL for the video
+			} else {
+				resetPreview()
+				alert("Please select an image or video file.")
+			}
 		}
 	}
 }

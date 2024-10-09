@@ -35,17 +35,11 @@ export default () => {
   const addAnnouncement = async (data) => {
     const formData = new FormData();
     formData.append("title", data.title);
-    console.log(data.title);
     formData.append("file", data.file);
-    console.log(data.file);
     formData.append("category", JSON.stringify(data.category));
-    console.log(JSON.stringify(data.category));
     formData.append("kontenType", data.kontenType);
-    console.log(data.kontenType);
     formData.append("previewUrl", data.previewUrl);
-    console.log(data.previewUrl);
     formData.append("type", data.type);
-    console.log(data.type);
     const result = await $fetch("/api/announcement/createAnnouncement", {
       method: "POST",
       body: formData,
