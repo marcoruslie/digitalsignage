@@ -695,8 +695,8 @@ const isImage = ref(false)
 const isVideo = ref(false)
 async function handleFileUpload(event) {
 	// abort the file selection if the file size is over 100mb
-	if (event.target.files[0].size > 300000000) {
-		alert("File size is too large. Please select a file under 300MB.")
+	if (event.target.files[0].size > 100000000) {
+		alert("File size is too large. Please select a file under 100MB.")
 		return
 	}
 	else {
