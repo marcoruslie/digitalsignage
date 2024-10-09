@@ -8,7 +8,7 @@ import { tmpdir } from "os";
 
 export default defineEventHandler(async (event) => {
   console.log("masuk backend");
-  console.log(event);
+  console.log(event.req.headers);
   let formData;
   try {
     formData = await readMultipartFormData(event);
