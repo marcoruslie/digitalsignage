@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
   let formData;
   try {
     formData = await readMultipartFormData(event);
+    console.log(formData);
   } catch (error: any) {
     console.error(error);
     return {
