@@ -7,11 +7,13 @@ import { readMultipartFormData } from "h3";
 import { tmpdir } from "os";
 
 export default defineEventHandler(async (event) => {
+  console.log("masuk backend");
   let formData;
   try {
     formData = await readMultipartFormData(event);
     console.log(formData);
   } catch (error: any) {
+    console.log("error loading formdata");
     console.error(error);
     return {
       statusCode: 400,
