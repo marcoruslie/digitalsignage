@@ -116,17 +116,18 @@
 						</div>
 						<div class="flex flex-col">
 							<label for="categoryQty">Jumlah Pengumuman (Dalam 1 List Pengumuman)</label>
-							<input type="text" v-model="categoryQty"
+							<input type="number" v-model="categoryQty"
 								class="border-2 px-2 border-OnPrimaryContainer hover:border-Primary rounded-md hover:duration-300 h-10"
 								required />
 						</div>
 						<div class="flex flex-col">
 							<label for="categoryDuration">Durasi Per Pengumuman</label>
-							<input type="text" v-model="categoryDuration"
+							<input type="number" v-model="categoryDuration"
 								class="border-2 px-2 border-OnPrimaryContainer hover:border-Primary rounded-md hover:duration-300 h-10"
-								placeholder="example: 192.168.0.33" required />
+								required />
 						</div>
-						<div v-for="role in listRole" class="flex justify-between">
+						<div v-for="role in listRole.filter((role) => role.role_name.toUpperCase() != 'ADMIN')"
+							class="flex justify-between">
 							<div class="uppercase">{{ role.role_name }}</div>
 
 							<div

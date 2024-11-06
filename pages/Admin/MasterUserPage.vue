@@ -137,7 +137,8 @@
 							<label for="role">Role</label>
 							<select v-model="role_id" required
 								class="text-OnPrimaryContainer rounded hover:text-OnPrimaryContainer hover:duration-300">
-								<option class="text-OnPrimaryContainer rounded py-1 px-2" v-for="item in roles"
+								<option class="text-OnPrimaryContainer rounded py-1 px-2"
+									v-for="item in roles.filter((item) => item.role_name.toUpperCase() != 'ADMIN')"
 									:key="item.role_id" :value="item.role_id">
 									{{ item.role_name }}
 								</option>

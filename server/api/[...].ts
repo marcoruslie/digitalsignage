@@ -112,6 +112,7 @@ io.on("connection", async (socket) => {
   // event to send file to client
   socket.on("sendFile", (data) => {
     const fileData: any = [];
+    console.log("DATA", data);
     data.selectedItems.forEach(async (item: any) => {
       item.announcement_in_list.forEach(async (ann: any) => {
         const fileUrl = ann.announcement.an_url;
