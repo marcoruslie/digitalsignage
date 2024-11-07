@@ -616,7 +616,7 @@ const editScreen = async () => {
 	}
 	updateScreen(data)
 		.then((res) => {
-			openNotif("Success", res)
+			openNotif("Success", 'Berhasil Merubah Data Screen')
 		})
 		.catch((err) => {
 			openNotif("Error", err)
