@@ -43,12 +43,16 @@ export default defineEventHandler(async (event) => {
                 an_url: downloadFile.filePath,
               },
             });
-          } else if (body.kategoriName === "Pengumuman Kegiatan") {
+          } else if (
+            body.kategoriName === "Pengumuman Kegiatan" ||
+            body.kategoriName === "Poster Tugas Akhir"
+          ) {
             // Download file from Google Drive
             downloadFile = await $fetch("/api/downloadgd/gdfile", {
               method: "POST",
               body: {
                 file_id: announcement.an_url,
+                file_kategori: body.kategoriName.replace(" ", ""),
               },
             });
 

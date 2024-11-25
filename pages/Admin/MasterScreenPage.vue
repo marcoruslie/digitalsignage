@@ -168,6 +168,8 @@
 					<div>{{ reminder.Judul }}</div>
 
 					<div class="flex justify-center items-center space-x-2">
+						<div>{{ reminder.Startdate }}</div>
+						<div> - </div>
 						<div>{{ reminder.Deadline }}</div>
 						<img src="\icon-delete.png" @click="deleteReminder(index)"
 							class="w-10 h-10 hover:bg-red-950 bg-red-400 rounded duration-300">
@@ -177,8 +179,16 @@
 				<div v-if="showNewReminderInput" class="space-y-1">
 					<input v-model="newReminderTitle" type="text" placeholder="New Reminder Title"
 						class="w-full p-2 rounded text-OnPrimaryContainer bg-primaryContainer border border-primary">
-					<input v-model="newReminderDeadline" type="date" placeholder="New Reminder Deadline"
-						class="w-full p-2 rounded text-OnPrimaryContainer bg-primaryContainer border border-primary">
+					<div class="flex">
+						<div class="w-full">Start Date</div>
+						<div class="w-full">Deadline</div>
+					</div>
+					<div class="flex">
+						<input v-model="newReminderStartdate" type="date" placeholder="New Reminder Deadline"
+							class="w-full p-2 rounded text-OnPrimaryContainer bg-primaryContainer border border-primary">
+						<input v-model="newReminderDeadline" type="date" placeholder="New Reminder Deadline"
+							class="w-full p-2 rounded text-OnPrimaryContainer bg-primaryContainer border border-primary">
+					</div>
 					<button @click="addNewReminder"
 						class="w-full bg-Primary text-OnPrimary py-2 rounded-lg hover:bg-onPrimaryContainer">
 						Save
@@ -376,6 +386,7 @@ const { createScreen, deleteScreen, getScreen, updateScreen } = useScreen()
 const listScreen = ref(await getScreen())
 const isHoveredCurrentMusic = ref({})
 const currentUser = ref(null)
+const newReminderStartdate = ref()
 onBeforeMount(async () => {
 	const router = useRouter()
 	const token = sessionStorage.getItem("currentUser")
@@ -715,6 +726,7 @@ const addNewReminder = () => {
 	}
 	const newReminder = {
 		Judul: newReminderTitle.value,
+		Startdate: new Date(newReminderStartdate.value).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
 		Deadline: new Date(newReminderDeadline.value).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
 	}
 	tempReminder.value.push(newReminder)

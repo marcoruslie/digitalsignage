@@ -22,7 +22,19 @@
 			<div :class="uploadType == 'langsung' ? 'flex-grow' : 'hidden'"
 				class="flex flex-col flex-grow w-full justify-center overflow-hidden">
 				<div class="flex flex-1 flex-col space-y-2">
-					<input type="file" @change="handleFileUpload" />
+					<select class="rounded border px-4 py-2" v-model="uploadFileType" name="" id="">
+						<option value="file">Local File</option>
+						<option value="instagram">Instagram Posting(Image)</option>
+					</select>
+					<div v-if="uploadFileType == 'file'">
+						<input type="file" @change="handleFileUpload" />
+					</div>
+					<div v-else class="w-full flex space-x-2">
+						<input type="text" class="rounded border px-4 py-2 w-full" v-model="postUrl"
+							placeholder="Masukkan url dari instagram post pastikan instagram dalam kondisi public">
+						<button @click="getImageUrlFromPost"
+							class="rounded text-white bg-Primary w-fit px-4 py-2 cursor-pointer hover:bg-PrimaryContainer hover:text-Primary duration-300">search</button>
+					</div>
 					<!-- Kategori -->
 					<select class="rounded border px-4 py-2" v-model="kategoriKonten" placeholder="Pilih Kategori">
 						<option v-for="data in currentUser.role.categoryuser" :disabled="data.category.cat_name == 'Lowongan Magang' ||
@@ -432,6 +444,7 @@ const onLoading = ref(false)
 const loadingMessage = ref("")
 const loadingProgress = ref(0)
 const kontenType = ref("")
+const uploadFileType = ref("file")
 onBeforeMount(async () => {
 	const router = useRouter();
 	if (sessionStorage.getItem('currentUser') != null) {
@@ -691,6 +704,7 @@ const updateProgress = (progress) => {
 	}
 }
 const previewUrl = ref(null)
+const postUrl = ref("")
 const isImage = ref(false)
 const isVideo = ref(false)
 async function handleFileUpload(event) {
@@ -719,6 +733,34 @@ async function handleFileUpload(event) {
 				alert("Please select an image or video file.")
 			}
 		}
+	}
+}
+const getImageUrlFromPost = async () => {
+	setLoadingState(true, "Sedang mengambil konten instagram...")
+	try {
+		const extractImage = await $fetch('/api/downloadMedia', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: {
+				url: postUrl.value,
+			},
+		});
+		// Fetch the image via your Nuxt API
+		const response = await fetch(`/api/proxyImage?imageUrl=${encodeURIComponent(extractImage)}`);
+
+		if (!response.ok) {
+			throw new Error('Failed to fetch the image.');
+		}
+		isImage.value = true
+		const imageBlob = await response.blob(); // Get the image as a Blob
+		setLoadingState(false)
+		previewUrl.value = URL.createObjectURL(imageBlob); // Convert to Object URL for display
+	} catch (error) {
+		setLoadingState(false)
+		openNotif("Error", "Gagal mengambil konten instagram")
+		console.error('Error loading image:', error);
 	}
 }
 function prevBtnClick() {
@@ -984,9 +1026,10 @@ const openModalSave = () => {
 			title: judulKonten.value,
 			category: kategoriKonten.value,
 			previewUrl: previewUrl.value,
+			postUrl: postUrl.value,
 			file: fileUpload.value,
 			kontenType: isImage.value ? "image" : "video",
-			type: "file",
+			type: uploadFileType.value,
 		}
 		modalDetailContent.value = true
 	}

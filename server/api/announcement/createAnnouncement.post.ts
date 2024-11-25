@@ -28,6 +28,7 @@ export default defineEventHandler(async (event) => {
     const cat_id = formData.find((field: any) => field.name === "category");
     const file = formData.find((field: any) => field.name === "file");
     const fileUrl = formData.find((field: any) => field.name === "previewUrl");
+    const postUrl = formData.find((field: any) => field.name === "postUrl");
     const saveType = formData.find((field: any) => field.name === "type");
     if (!title || !type || !cat_id || !file || !saveType) {
       return {
@@ -47,6 +48,7 @@ export default defineEventHandler(async (event) => {
     };
 
     let finalFilePath = "";
+    console.log(saveType.data.toString());
     try {
       await prisma.$transaction(async (prisma) => {
         const announcement = await prisma.announcement.create({
@@ -70,6 +72,7 @@ export default defineEventHandler(async (event) => {
         console.log(ext);
         const tempDir = tmpdir();
         const tempFilePath = path.join(tempDir, `${announcement.an_id}${ext}`);
+        console.log(tempFilePath);
         const resourcesDir = path.resolve(`resources/${kategori}`);
         const accFilePath = path.join(
           "/_nuxt",
@@ -106,6 +109,18 @@ export default defineEventHandler(async (event) => {
             }
           } catch (error) {
             console.warn(tempFilePath);
+            console.error("Error processing the file:", error);
+            throw new Error("Failed to compress and save the file");
+          }
+        } else if (saveType.data.toString() === "instagram") {
+          console.log(postUrl!.data.toString());
+          try {
+            await downloadInstagramMedia(
+              postUrl!.data.toString(),
+              resourcesDir,
+              announcement.an_id
+            );
+          } catch (error) {
             console.error("Error processing the file:", error);
             throw new Error("Failed to compress and save the file");
           }

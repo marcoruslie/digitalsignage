@@ -39,6 +39,7 @@ export default () => {
     formData.append("category", JSON.stringify(data.category));
     formData.append("kontenType", data.kontenType);
     formData.append("previewUrl", data.previewUrl);
+    formData.append("postUrl", data.postUrl);
     formData.append("type", data.type);
     const result = await $fetch("/api/announcement/createAnnouncement", {
       method: "POST",
