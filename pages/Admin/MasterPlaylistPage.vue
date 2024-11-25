@@ -535,8 +535,8 @@ const listPlaylist = ref(await getPlaylist())
 const listClient = ref(await getCLient())
 const currentUser = ref(null)
 const currentScreen = ref(null)
-// const host = "http://192.168.9.203"
-const host = "http://localhost:3000"
+const host = "http://192.168.9.203"
+//const host = "http://localhost:3000"
 const socket = io(host, {
 	path: "/api/socket.io",
 })

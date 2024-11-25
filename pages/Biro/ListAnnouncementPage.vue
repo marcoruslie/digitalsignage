@@ -494,8 +494,8 @@ const selectedItems = ref([])
 const modalSetReminder = ref(false)
 const listReminder = ref(await getReminderClient())
 console.log("CLIENT:", listReminder.value)
-// const host = "http://192.168.9.203"
-const host = "http://localhost:3000"
+const host = "http://192.168.9.203"
+// const host = "http://localhost:3000"
 const socket = io(host, {
 	path: "/api/socket.io",
 })
