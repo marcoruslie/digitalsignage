@@ -715,6 +715,7 @@ const reminderData = () => {
 	}
 }
 const ScreenDetail = (ip) => {
+	console.log(listScreen.value)
 	const screen = listScreen.value.find((screen) => screen.sc_ip === ip)
 	if (screen) {
 		return screen
