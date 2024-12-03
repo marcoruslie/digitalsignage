@@ -157,8 +157,7 @@
 					v-model="reminderScreenIp" @change="reminderData">
 					<option v-if="listScreen != null" v-for="ip in listReminder.filter((item) => item.socket_ip != '')"
 						:value="ip.socket_ip" class="text-onPrimary">{{
-							ip.socket_ip + " - " +
-							ScreenDetail(ip.socket_ip).sc_location }}
+							ip.socket_ip + " - " }}
 					</option>
 				</select>
 
