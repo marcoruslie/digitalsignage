@@ -505,6 +505,7 @@ const socket = io(host, {
 })
 onMounted(async () => {
 	console.log("REMINDER", listReminder.value);
+	console.log("LIST SCREEN", listScreen.value)
 	const tag = document.createElement("script")
 	tag.src = "https://www.youtube.com/iframe_api"
 	const firstScriptTag = document.getElementsByTagName("script")[0]
