@@ -550,6 +550,7 @@ const toggleModalReminder = () => {
 const reminderScreenIp = ref("")
 const showNewReminderInput = ref(false)
 const newReminderTitle = ref("")
+const newReminderStartdate = ref('')
 const newReminderDeadline = ref('')
 const tempReminder = ref(null)
 const modalSaveReminder = ref(false)
@@ -576,6 +577,7 @@ const addNewReminder = () => {
 	}
 	const newReminder = {
 		Judul: newReminderTitle.value,
+		StartDate: new Date(newReminderStartdate.value).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
 		Deadline: new Date(newReminderDeadline.value).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
 	}
 	tempReminder.value.push(newReminder)
