@@ -156,8 +156,10 @@
 				<select v-if="listReminder != null && listReminder.length > 0" class="w-full rounded py-2 border mb-4"
 					v-model="reminderScreenIp" @change="reminderData">
 					<option v-if="listScreen != null" v-for="ip in listReminder.filter((item) => item.socket_ip != '')"
-						:value="ip.socket_ip" class="text-onPrimary">{{
-							ip.socket_ip + " - " }}
+						:value="ip.socket_ip" class="text-onPrimary">
+						<div v-if="ScreenDetail(ip.socket_ip)">{{
+							ip.socket_ip + " - " + ScreenDetail(ip.socket_ip).sc_name + " - " +
+							ScreenDetail(ip.socket_ip).sc_location }}</div>
 					</option>
 				</select>
 
