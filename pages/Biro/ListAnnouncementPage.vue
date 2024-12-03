@@ -577,7 +577,7 @@ const addNewReminder = () => {
 	}
 	const newReminder = {
 		Judul: newReminderTitle.value,
-		StartDate: new Date(newReminderStartdate.value).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
+		Startdate: new Date(newReminderStartdate.value).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
 		Deadline: new Date(newReminderDeadline.value).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
 	}
 	tempReminder.value.push(newReminder)
